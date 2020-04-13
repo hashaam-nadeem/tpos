@@ -1,0 +1,121 @@
+name: transact
+description: A new Flutter project.
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^0.1.2
+  flutter_staggered_grid_view: ^0.3.0
+  flutter_custom_dialog: ^1.0.15
+  intl: ^0.15.8
+  dashed_container: ^1.0.1
+  image_picker: ^0.6.3+1
+  flutter_swiper: ^1.1.6
+  datetime_picker_formfield: ^1.0.0
+  credit_card_type_detector: ^1.1.0
+  flutter_masked_text: any
+  font_awesome_flutter: ^8.5.0
+  credit_card: ^0.1.8
+  barcode_scan: ^1.0.0
+  fl_chart: any
+  flutter_slidable: any
+  share: ^0.6.3+5
+  geolocator: ^5.2.1
+  geocoder: ^0.2.1
+  smooth_star_rating: ^1.0.4+2
+  flutter_styled_toast: ^1.2.1
+  overlay_support: ^1.0.2
+  data_connection_checker: ^0.3.4
+  pull_to_refresh: ^1.5.8
+  device_id: ^0.2.0
+  shared_preferences: ^0.5.3+4
+  firebase_auth: ^0.14.0+5
+  firebase_cloud_messaging: 4.0.4+1
+  fluttertoast: ^3.1.3
+  http: ^0.12.0+2
+  device_info: ^0.4.0+3
+  dio: ^3.0.8
+  image_cropper: ^1.1.0
+  google_maps_webservice: ^0.0.16
+  image_test_utils: ^1.0.0
+  modal_progress_hud: ^0.1.3
+  progress_dialog: ^1.2.1
+  flutter_google_places: ^0.1.3
+  cloud_firestore: ^0.12.11
+  bubble: ^1.1.9+1
+  flutter_picker: ^1.1.0
+  flutter_rating_bar: ^3.0.0+1
+  google_maps_flutter: ^0.5.21+4
+  
+ 
+
+
+
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.7.4
+flutter_icons:
+  android: "launcher_icon" 
+  ios: true
+  image_path: "images/applogo.png"
+   
+
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+ 
+  assets:
+    - images/
+    
+
+
+  fonts:
+    - family: antipasto
+      fonts:
+        - asset: fonts/antipasto.ttf
+    - family: Roboto
+      fonts:
+        - asset: fonts/Roboto-Medium.ttf
+    - family: CaviarDreams
+      fonts:
+        - asset: fonts/CaviarDreams.ttf
+    - family: ProbaPro
+      fonts:
+        - asset: fonts/ProbaPro.ttf
+      
+
+    
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
