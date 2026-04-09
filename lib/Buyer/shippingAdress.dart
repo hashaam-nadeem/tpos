@@ -80,11 +80,11 @@ getPersonal() async
     //int id=User.userData.orderModel.result[User.userData.index].lineDetail[selectedIndex].id;
     //print("selected id: " + id.toString());
     //int r=_productRating.toInt();
-    if (name.text.isEmpty ||
-        contact.text.isEmpty ||
-        country.text.isEmpty ||
-        city.text.isEmpty ||
-        state.text.isEmpty ||
+    if (name.text.isEmpty &&
+        contact.text.isEmpty &&
+        country.text.isEmpty &&
+        city.text.isEmpty &&
+        state.text.isEmpty &&
         address.text.isEmpty) {
       Fluttertoast.showToast(
           msg: "Please enter the required field",
@@ -300,6 +300,9 @@ getPersonal() async
       width: double.infinity,
       child: TextFormField(
         controller: _controller,
+        keyboardType: _controller==contact?
+        TextInputType.number
+        :TextInputType.multiline,
         cursorColor: HexColor("#9E9E9E"),
         style: TextStyle(
             fontSize: 14, color: Colors.black, fontWeight: FontWeight.bold),

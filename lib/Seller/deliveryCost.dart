@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:transact/Model/UserModel.dart';
 import 'package:transact/Model/apismodel.dart';
 import 'package:transact/Model/getauthentication.dart';
 import 'package:transact/Seller/sellerHome.dart';
@@ -20,6 +21,7 @@ class _DeliveryCostState extends State<DeliveryCost> {
 TextEditingController cost=TextEditingController();
 TextEditingController order=TextEditingController();
 ProgressDialog pr;
+bool productSelected=false;
   setCost() async {
     pr.show();
     var header = {
@@ -30,8 +32,8 @@ ProgressDialog pr;
       "SecurityPinEnabled": "",
       "DeliveryCost": "${cost.text}",
       "MinimumOrder": "${order.text}",
+      "IsDeliveryFree":"${User.userData.isdeliveryFree}"
     };
-
     print(header);
     print(body);
     var response = await http.post(
@@ -154,10 +156,49 @@ ProgressDialog pr;
         padding: EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: <Widget>[
+
+            Row(
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          User.userData.isdeliveryFree= !User.userData.isdeliveryFree;
+                          //sellingTypeProduct = !sellingTypeProduct;
+                        });
+                      },
+                      child: Container(
+                        // margin: EdgeInsets.only(top:10),
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey, width: 1.5)),
+                        child: Center(
+                          child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: User.userData.isdeliveryFree == true
+                                    ? Colors.black
+                                    : Colors.white,
+                              )),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                      //height: 10,
+                    ),
+                    Text("Free Delivery", style: TextStyle(color: Colors.black,fontSize: 18)),
+                  ],
+                ),
+               
             _text("Delivery Cost"),
-            _textField("\$15", 1,cost),
+            _textField("\$${User.userData.deliveryCost}", 1,cost),
             _text("On minumum order"),
-            _textField("\$1500", 2,order),
+            _textField("\$${User.userData.minOrder}", 2,order),
             _button(),
           ],
         ),
@@ -182,6 +223,8 @@ ProgressDialog pr;
       height: 50,
       child: TextFormField(
         controller: _controller,
+        enabled: User.userData.isdeliveryFree==true?false:true,
+        keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         decoration: InputDecoration(
           filled: true,
@@ -213,7 +256,13 @@ ProgressDialog pr;
   Widget _button() {
     return GestureDetector(
       onTap: () {
-        if(order.text.isEmpty || cost.text.isEmpty)
+        if(User.userData.isdeliveryFree==true)
+        {
+          setCost();
+        }
+        else
+        {
+          if(order.text.isEmpty || cost.text.isEmpty)
         {
           Fluttertoast.showToast(
               msg: "please enter the required field",
@@ -224,7 +273,9 @@ ProgressDialog pr;
         {
           setCost();
         }
-       
+
+        }
+               
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 10),

@@ -519,7 +519,63 @@ class API {
   -------------------------------------------------------------*/
       static const getPerosalInformation=
       "$API_URL/Api/User/GetPersonalInformation";
+
+
+       /*------------------------------------------------------------
+                 API:TotalExpanse
+                 TYPE: get
+  -------------------------------------------------------------*/
+      static const TotalExpanse=
+      "$API_URL/Api/Account/ExpenseReport";
+
+      /*------------------------------------------------------------
+                 API:TotalSaleHistory
+                 TYPE: get
+  -------------------------------------------------------------*/
+      static const TotalSaleHistory=
+      "$API_URL/Api/Products/SaleHistory";
+
+      /*------------------------------------------------------------
+                 API:TotalPurchaseHistory
+                 TYPE: get
+  -------------------------------------------------------------*/
+      static const TotalPurchaseHistory=
+      "$API_URL/Api/Products/PurchaseHistory";
+
+            /*------------------------------------------------------------
+                 API:CartEmpty
+                 TYPE: get
+  -------------------------------------------------------------*/
+      static const CartEmpty=
+      "$API_URL/Api/Shared/MakeCartEmpty";
+
+       /*------------------------------------------------------------
+                 API:marketPlaceStoreType
+                 TYPE: get
+  -------------------------------------------------------------*/
+      static const marketPlaceStoreType=
+      "$API_URL/Api/Shared/GetMarketPlaceByStoreType";
       
+
+      /*------------------------------------------------------------
+                 API:getUserSettings
+                 TYPE: get
+  -------------------------------------------------------------*/
+      static const getUserSettings=
+      "$API_URL/Api/User/GetUserSetting";
+
+      /*------------------------------------------------------------
+                 API:markAllSeenNotification
+                 TYPE: get
+  -------------------------------------------------------------*/
+      static const markAllSeenNotification=
+      "$API_URL/Api/Shared/MarkNotificationSeen";
+          /*------------------------------------------------------------
+                 API:markAllSeenNotification
+                 TYPE: get
+  -------------------------------------------------------------*/
+      static const LatlongFilter=
+      "$API_URL/Api/Shared/GetMarketPlaceByLocation";
 }
 
 

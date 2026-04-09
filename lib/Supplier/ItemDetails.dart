@@ -81,6 +81,10 @@ class _ItemDetailsState extends State<ItemDetails> {
           scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) {
             return Image.network("${API.API_URL}${User.userData.dashBoardResult.result[User.userData.index].imgList[index].url}",
+
+             width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height*.2,
+                fit: BoxFit.contain,
              // height: 200,
                 //width: 150,
               );

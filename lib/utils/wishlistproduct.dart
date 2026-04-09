@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:transact/AppBar.dart';
+import 'package:transact/Buyer/itemDetails.dart';
 import 'package:transact/Model/UserModel.dart';
 import 'package:transact/Model/apismodel.dart';
 import 'package:transact/Model/getauthentication.dart';
@@ -11,6 +12,7 @@ import 'package:transact/Model/marketplacemodel.dart';
 import 'package:transact/Model/productsearchmodel.dart';
 import 'package:transact/Model/searchmodel.dart';
 import 'package:transact/Model/submitsearchmodel.dart';
+import 'package:transact/utils/routes.dart';
 import 'package:transact/utils/utils.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -51,6 +53,7 @@ class _WishList extends State<WishList> {
       } else {
         setState(() {
           marketPlaceModel = MarketPlaceModel.fromJson(Json['Data']);
+          
         });
       }
     } else {
@@ -111,14 +114,16 @@ class _WishList extends State<WishList> {
   Widget _itemCardSupplier(int index) {
     return GestureDetector(
       onTap: () {
-        // setState(() {
-        //   User.userData.index = index;
-        // });
+        setState(() {
+          User.userData.index = index;
+        });
+        AppRoutes.push(context, ItemDetailsBuyer());
+        setState(() {
+          User.userData.marketPlaceModel=marketPlaceModel;
+        });
+
         // print(User.userData.index F= index);
-        //AppRoutes.push(context, ItemDetailsBuyer());
-        // setState(() {
-        //   User.userData.index=index;
-        // });
+        
         // AppRoutes.push(context, ItemDetails());
       },
       child: Container(
@@ -210,6 +215,22 @@ class _WishList extends State<WishList> {
                       ],
                     ),
                   ),
+                   Row(
+                    children: <Widget>[
+                      marketPlaceModel.result[index].gst==null?
+                      Text("")
+                      :
+                       Text(
+                          "including ${marketPlaceModel.result[index].gst}% gst",
+                          style: TextStyle(
+                              color: HexColor("#3B444B"),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'CaviarDreams'),
+                        ),
+                    ],
+                  ),
+                
                   Expanded(
                     child: Align(
                       alignment: Alignment.centerRight,

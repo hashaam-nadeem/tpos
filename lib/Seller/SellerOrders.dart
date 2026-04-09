@@ -42,6 +42,43 @@ class _SellerOrders extends State<SellerOrders> {
   bool pending = true, inProcess = false, rejected = false, delivered = false;
   OrderModel orderModel = OrderModel();
 
+  getPending() async {
+   // pr.show();
+    var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+    var response = await http.get(
+      "${API.getMyOrder}?status=0",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if (response.statusCode == 200) {
+      if (Json['Data']['WithError'] == false) {
+        //pr.dismiss();
+        setState(() {
+          orderModel = OrderModel.fromJson(Json['Data']);
+          User.userData.orderModel=orderModel;
+        });
+      } else {
+        //pr.dismiss();
+        Fluttertoast.showToast(
+            msg: "${Json['data']['ShortMessage']}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+
+        setState(() {
+          orderModel = OrderModel();
+        });
+      }
+    } else {
+      //pr.dismiss();
+      Fluttertoast.showToast(
+          msg: "response status: ${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+  }
 
   getPendingList() async {
     pr.show();
@@ -198,7 +235,7 @@ class _SellerOrders extends State<SellerOrders> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getPendingList();
+    getPending();
   }
 
   @override
@@ -222,10 +259,11 @@ class _SellerOrders extends State<SellerOrders> {
           // bottomNavigationBar:
           //     order == true && !_selection[2] ? _bottom() : null,
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(order == false ? 110 : 70),
+            preferredSize: Size.fromHeight( 125),
             child: CustomeAppBar(
               homepage: false,
               title: "My Orders",
+              child: Buttons(),
               // child: order == false
               //     ? Buttons
               //     : Container(),
@@ -237,12 +275,12 @@ class _SellerOrders extends State<SellerOrders> {
                   height: MediaQuery.of(context).size.height,
                   child: Column(
                     children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Buttons(),
-                        ],
-                      ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   children: <Widget>[
+                          
+                      //   ],
+                      // ),
                       Expanded(
                           child: ListView.builder(
                         itemCount: orderModel.result != null
@@ -255,7 +293,7 @@ class _SellerOrders extends State<SellerOrders> {
                     ],
                   ),
                 )
-              : _order()),
+              : Container(child: _order(),)),
     );
   }
 
@@ -263,12 +301,12 @@ class _SellerOrders extends State<SellerOrders> {
 
   Widget Buttons() {
     return Container(
-      margin: EdgeInsets.only(top: 10, bottom: 10),
-      width: MediaQuery.of(context).size.width,
+      margin: EdgeInsets.only(top: 5, bottom: 2),
+      width: MediaQuery.of(context).size.width*.75,
       height: MediaQuery.of(context).size.height * .08,
       decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.blueGrey, width: 1),
+         // color: Colors.white,
+         // border: Border.all(color: Colors.white, width: 1),
           borderRadius: BorderRadius.all(Radius.circular(10))),
       child: Center(
         child: Row(
@@ -333,36 +371,37 @@ class _SellerOrders extends State<SellerOrders> {
                 ),
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  pending = false;
-                  inProcess = false;
-                  rejected = true;
-                  delivered = false;
-                });
-                getRejectedList();
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * .2,
-                height: MediaQuery.of(context).size.height * .06,
-                decoration: BoxDecoration(
-                    color:
-                        rejected == true ? HexColor("#3B444B") : Colors.white,
-                    border: Border.all(color: Colors.blueGrey, width: 1),
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: Center(
-                  child: Text(
-                    "Rejected",
-                    style: TextStyle(
-                        color: rejected == true
-                            ? Colors.white
-                            : HexColor("#3B444B"),
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
+            // GestureDetector(
+            //   onTap: () {
+            //     setState(() {
+            //       pending = false;
+            //       inProcess = false;
+            //       rejected = true;
+            //       delivered = false;
+            //     });
+            //     getRejectedList();
+            //   },
+            //   child: Container(
+            //     width: MediaQuery.of(context).size.width * .2,
+            //     height: MediaQuery.of(context).size.height * .06,
+            //     decoration: BoxDecoration(
+            //         color:
+            //             rejected == true ? HexColor("#3B444B") : Colors.white,
+            //         border: Border.all(color: Colors.blueGrey, width: 1),
+            //         borderRadius: BorderRadius.all(Radius.circular(10))),
+            //     child: Center(
+            //       child: Text(
+            //         "Rejected",
+            //         style: TextStyle(
+            //             color: rejected == true
+            //                 ? Colors.white
+            //                 : HexColor("#3B444B"),
+            //             fontWeight: FontWeight.bold),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+           
             GestureDetector(
               onTap: () {
                 setState(() {
@@ -527,7 +566,7 @@ class _SellerOrders extends State<SellerOrders> {
 Widget _orderDetails() {
     return Container(
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height * .5,
+        height: MediaQuery.of(context).size.height * .6,
         // margin: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
         color: Colors.white,
         padding: EdgeInsets.all(10),
@@ -879,7 +918,7 @@ Widget _orderDetails() {
                   Text(
                     "${orderModel.result[selectedIndex].customerName}",
                     style: style2.copyWith(
-                        fontFamily: "antipasto",
+                       // fontFamily: "antipasto",
                         fontSize: 18,
                         color: Colors.black),
                   ),
@@ -892,13 +931,39 @@ Widget _orderDetails() {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  orderModel.result[selectedIndex].deliveryType==0?
                   Text(
-                    "ABN",
+                    "Seller",
+                    style: style2.copyWith(
+                        fontFamily: "antipasto",
+                        fontSize: 18,
+                        color: Colors.black),
+                  )
+                  :
+                  orderModel.result[selectedIndex].deliveryType==1?
+                  Text(
+                    "Online",
+                    style: style2.copyWith(
+                        fontFamily: "antipasto",
+                        fontSize: 18,
+                        color: Colors.black),
+                  ):
+                  orderModel.result[selectedIndex].deliveryType==1?
+                  Text(
+                    "Self PickUp",
+                    style: style2.copyWith(
+                        fontFamily: "antipasto",
+                        fontSize: 18,
+                        color: Colors.black),
+                  ):
+                  Text(
+                    "Free",
                     style: style2.copyWith(
                         fontFamily: "antipasto",
                         fontSize: 18,
                         color: Colors.black),
                   ),
+                 
                   Text(
                     "Delivery",
                     style: style2.copyWith(fontSize: 12),
@@ -907,6 +972,7 @@ Widget _orderDetails() {
               )
             ],
           ),
+         
           Container(
             margin: EdgeInsets.only(top: 10, bottom: 10),
             child: Row(
@@ -982,7 +1048,7 @@ Widget _orderDetails() {
                 _product(),
                 _divider(),
               orderModel.result[selectedIndex].paymentMethod==0?
-                Text("Payment Method: COD"):
+                Text("Payment Method: Cash"):
                 orderModel.result[selectedIndex].paymentMethod==1?
                 Text("Payment Method: CARD"):
                 Text("BANK"),

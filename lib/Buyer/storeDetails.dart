@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:transact/Buyer/itemDetails.dart';
 import 'package:transact/Model/UserModel.dart';
@@ -20,6 +22,7 @@ class StoreDetails extends StatefulWidget {
 
 class _StoreDetailsState extends State<StoreDetails> {
   var favorite = false;
+  ProgressDialog pr;
  final RefreshController _refreshController = RefreshController();
   MarketPlaceModel marketPlaceModel = MarketPlaceModel();
     getSellerProduct() async {
@@ -64,13 +67,26 @@ class _StoreDetailsState extends State<StoreDetails> {
   }
   @override
   Widget build(BuildContext context) {
+    pr = new ProgressDialog(context, type: ProgressDialogType.Normal);
+    pr.style(
+      message: 'Uploading...',
+      borderRadius: 10.0,
+      backgroundColor: Colors.white,
+      progressWidget: CircularProgressIndicator(),
+      elevation: 10.0,
+      insetAnimCurve: Curves.easeInOut,
+      progressTextStyle: TextStyle(
+          color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
+      messageTextStyle: TextStyle(
+          color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600),
+    );
     return SafeArea(
       child: Scaffold(
           backgroundColor: HexColor("#F5F7FA"),
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(70),
             child: CustomeAppBar(
-              title: "Store Name",
+              title: "Store",
               homepage: false,
             ),
           ),
@@ -92,21 +108,19 @@ class _StoreDetailsState extends State<StoreDetails> {
           )),
     );
   }
-     Widget _itemCardSupplier(int index) {
+  Widget _itemCardSupplier(int index) {
     return GestureDetector(
       onTap: () {
         setState(() {
-          User.userData.index=index;
+          User.userData.index = index;
+          User.userData.marketPlaceModel=marketPlaceModel;
         });
-        print(User.userData.index=index);
+        print(User.userData.index = index);
+        
         AppRoutes.push(context, ItemDetailsBuyer());
-        // setState(() {
-        //   User.userData.index=index;
-        // });
-        // AppRoutes.push(context, ItemDetails());
       },
       child: Container(
-        //margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 4),
+        margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 4),
         color: Colors.white,
         child: Stack(
           children: <Widget>[
@@ -114,17 +128,30 @@ class _StoreDetailsState extends State<StoreDetails> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                
-                  marketPlaceModel.result[index].imagePath==null? Image.asset("images/shirt.png"):
-                  
-                  Image.network("${API.API_URL}${marketPlaceModel.result[index].imagePath}",width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height*.2,
+                  // marketPlaceModel.result[index].imagePath == null
+                  //     ? Image.asset("images/shirt.png")
+                  //     : Image.network(
+                  //         "${API.API_URL}${marketPlaceModel.result[index].imagePath}",
+                  //         width: MediaQuery.of(context).size.width,
+                  //         height: MediaQuery.of(context).size.height * .2,
+                  //       ),
+                   Container(
+                    
+                     width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height * .2,
+                    child: marketPlaceModel.result[index].imagePath == null
+                      ? Image.asset("images/shirt.png")
+                      : Image.network(
+                          "${API.API_URL}${marketPlaceModel.result[index].imagePath}",
+                         fit: BoxFit.cover,
+                        ),
                   ),
                   Container(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text(
+                        Flexible(
+                          child:Text(
                           "${marketPlaceModel.result[index].name}",
                           style: TextStyle(
                               color: HexColor("#3B444B"),
@@ -132,14 +159,15 @@ class _StoreDetailsState extends State<StoreDetails> {
                               fontWeight: FontWeight.bold,
                               fontFamily: 'CaviarDreams'),
                         ),
-                        GestureDetector(
-                          onTap: () {},
-                          child: Icon(
-                            Icons.more_vert,
-                            color: HexColor('#3B444B'),
-                            size: 22,
-                          ),
                         ),
+                        // GestureDetector(
+                        //   onTap: () {},
+                        //   child: Icon(
+                        //     Icons.more_vert,
+                        //     color: HexColor('#3B444B'),
+                        //     size: 22,
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
@@ -149,7 +177,11 @@ class _StoreDetailsState extends State<StoreDetails> {
                         Text(
                           "\$${marketPlaceModel.result[index].actualPrice}",
                           style: TextStyle(
-                              decoration:marketPlaceModel.result[index].withDiscount==true? TextDecoration.lineThrough:TextDecoration.none,
+                              decoration:
+                                  marketPlaceModel.result[index].withDiscount ==
+                                          true
+                                      ? TextDecoration.lineThrough
+                                      : TextDecoration.none,
                               color: HexColor("#707070"),
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -158,22 +190,23 @@ class _StoreDetailsState extends State<StoreDetails> {
                         SizedBox(
                           width: 5,
                         ),
-                        marketPlaceModel.result[index].withDiscount==true?
-                        Text(
-                          "\$${ marketPlaceModel.result[index].salePrice}",
-                          style: TextStyle(
-                              color: HexColor("#515C6F"),
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'CaviarDreams'),
-                        ):Text(
-                          "",
-                          style: TextStyle(
-                              color: HexColor("#515C6F"),
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'CaviarDreams'),
-                        ),
+                        marketPlaceModel.result[index].withDiscount == true
+                            ? Text(
+                                "\$${marketPlaceModel.result[index].salePrice}",
+                                style: TextStyle(
+                                    color: HexColor("#515C6F"),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'CaviarDreams'),
+                              )
+                            : Text(
+                                "",
+                                style: TextStyle(
+                                    color: HexColor("#515C6F"),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'CaviarDreams'),
+                              ),
                         SizedBox(
                           width: 5,
                         ),
@@ -188,6 +221,77 @@ class _StoreDetailsState extends State<StoreDetails> {
                       ],
                     ),
                   ),
+                     Row(
+                    children: <Widget>[
+                      marketPlaceModel.result[index].gst.toString().isEmpty?
+                      Text("")
+                      :
+                       Text(
+                          "including ${marketPlaceModel.result[index].gst}% gst",
+                          style: TextStyle(
+                              color: HexColor("#3B444B"),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'CaviarDreams'),
+                        ),
+                    ],
+                  ),
+                
+                 
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () async {
+                          pr.show();
+                          var header = {
+                            "Authorization":
+                                AuthenticationUser.getAuthentication(),
+                          };
+                          var body = {
+                            "productId": "${marketPlaceModel.result[index].id}"
+                          };
+                          var response = await http.post("${API.AddWishList}",
+                              headers: header, body: body);
+                          var Json = json.decode(response.body);
+                          print(Json);
+                          if (response.statusCode == 200) {
+                            if (Json['Data']['WithError'] == false) {
+                              pr.dismiss();
+                              Fluttertoast.showToast(
+                                  msg: "${Json['Data']['ShortMessage']}",
+                                  textColor: Colors.white,
+                                  backgroundColor: Colors.blueGrey);
+                               getSellerProduct();
+                            } else {
+                              pr.dismiss();
+                              Fluttertoast.showToast(
+                                  msg: "${Json['Data']['ShortMessage']}",
+                                  textColor: Colors.white,
+                                  backgroundColor: Colors.blueGrey);
+                            }
+                          } else {
+                            pr.dismiss();
+                            Fluttertoast.showToast(
+                                msg: "response status: ${response.statusCode}",
+                                textColor: Colors.white,
+                                backgroundColor: Colors.blueGrey);
+                          }
+                        },
+                        child: Icon(
+                          marketPlaceModel.result[index].isLikeByMe == false
+                              ? Icons.favorite_border
+                              : Icons.favorite,
+                          color:
+                              marketPlaceModel.result[index].isLikeByMe == false
+                                  ? HexColor('#3B444B')
+                                  : Colors.red,
+                          size: 22,
+                        ),
+                      ),
+                    ),
+                  ),
+                 marketPlaceModel.result[index].type==0?
                   Container(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -198,60 +302,45 @@ class _StoreDetailsState extends State<StoreDetails> {
                           fontWeight: FontWeight.bold,
                           fontFamily: 'CaviarDreams'),
                     ),
-                  ),
+                  ):Text(""),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          Icon(
-                            Icons.star,
-                            color: HexColor("#EFCE4A"),
-                            size: 9,
-                          ),
-                          Icon(
-                            Icons.star,
-                            color: HexColor("#EFCE4A"),
-                            size: 9,
-                          ),
-                          Icon(
-                            Icons.star,
-                            color: HexColor("#EFCE4A"),
-                            size: 9,
-                          ),
-                          Icon(
-                            Icons.star,
-                            color: HexColor("#EFCE4A"),
-                            size: 9,
-                          ),
-                          Icon(
-                            Icons.star,
-                            color: HexColor("#EFCE4A"),
-                            size: 9,
-                          ),
-                          SizedBox(
-                            width: 4,
-                          ),
-                          Text(
-                            "(10)",
-                            style: TextStyle(fontSize: 9),
-                          ),
-                        ],
-                      ),
+                      _fiveStar(marketPlaceModel.result[index].rating),
+                      marketPlaceModel.result[index].type==0?
+                      marketPlaceModel.result[index].qty<=0?
                       Text(
-                        "(81/100) IN STOCK",
+                        "out of Stock",
                         style: TextStyle(
-                            color: HexColor("#707070"),
+                            color: Colors.red,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'CaviarDreams'),
+                      ):Text(
+                        "IN STOCK",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'CaviarDreams'),
+                      ):Text(
+                        "Bundle",
+                        style: TextStyle(
+                            color: Colors.green,
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'CaviarDreams'),
                       ),
+                    
+
+
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
+                 marketPlaceModel.result[index].withDiscount==true?
+            
             Align(
                 alignment: Alignment.topRight,
                 child: Container(
@@ -263,24 +352,83 @@ class _StoreDetailsState extends State<StoreDetails> {
                       ),
                     ),
                     child: Center(
-                      child: 
-                      marketPlaceModel.result[index].isDiscountPercentage==true?
-                      Text(
-                        "-${marketPlaceModel.result[index].totalDiscount}\$",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 8, color: Colors.white),
-                      )
-                      :
-                      Text(
-                        "-${marketPlaceModel.result[index].totalDiscount}%",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 8, color: Colors.white),
-                      ),
-                    ))),
+                      child: marketPlaceModel
+                                  .result[index].isDiscountPercentage ==
+                              true
+                          ? Text(
+                              "-${marketPlaceModel.result[index].totalDiscount}%",
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(fontSize: 8, color: Colors.white),
+                            )
+                          : Text(
+                              "-${marketPlaceModel.result[index].totalDiscount}\$",
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(fontSize: 8, color: Colors.white),
+                            ),
+                    )))
+          :Text(""),
           ],
         ),
       ),
     );
+  }
+  
+   Widget showRating() {
+    return Container(
+      child: Icon(
+        Icons.star,
+        color: HexColor("#EFCE4A"),
+        size: 9,
+      ),
+    );
+  }
+   Widget _fiveStar(var rat) {
+    return 
+    Container(
+        // margin: EdgeInsets.only(
+        //   top: id == 1 ? 10 : 0.0,
+        //   bottom: 10,
+        // ),
+        child: 
+        RatingBar(
+   initialRating: 0,
+   direction: Axis.horizontal,
+   allowHalfRating: true,
+   itemCount: rat,
+   itemSize: 20,
+   glow: true,
+   unratedColor: Colors.amber,
+   //itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+   itemBuilder: (context, _) => Icon(
+     Icons.star,
+     color: Colors.amber,
+   ),
+   onRatingUpdate: (rating) {
+     print(rating);
+   },
+)
+        // SmoothStarRating(
+        //   //rating: rat.todouble(),
+        //   //rating:rat,
+        //   size: 14,
+        //   filledIconData: Icons.star,
+        //   halfFilledIconData: Icons.star_half,
+        //   defaultIconData: Icons.star_border,
+        //   color: Colors.yellow[600],
+        //   borderColor: Colors.yellow[600],
+        //   starCount: rat,
+        //   //allowHalfRating: false,
+        //   spacing: 0.2,
+        //   onRatingChanged: (value) {
+        //     setState(() {
+        //       //_productRating = value;
+        //     });
+        //     //print(_productRating);
+        //   },
+        // )
+        );
   }
 
   Widget _itemCardSupplierr() {

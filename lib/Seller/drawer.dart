@@ -216,7 +216,8 @@ class _SellerDrawerState extends State<SellerDrawer> {
             children: <Widget>[
               Stack(children: [
                 Center(
-                  child: Container(
+                  child: 
+                  Container(
                     margin: EdgeInsets.only(top: 25),
                     child: CircleAvatar(
                       radius: 60,
@@ -227,6 +228,7 @@ class _SellerDrawerState extends State<SellerDrawer> {
                           : AssetImage("images/profile.png"),
                     ),
                   ),
+               
                 ),
                 Align(
                   alignment: Alignment.topRight,
@@ -271,7 +273,7 @@ class _SellerDrawerState extends State<SellerDrawer> {
               _buildRow("images/reports.png", "Reports"),
               _buildRow("images/cart.png", "My Orders"),
               _buildRow("images/history.png", "History"),
-              _buildRow("images/wallet.png", "Wallet"),
+             // _buildRow("images/wallet.png", "Wallet"),
               _buildRow("images/user2.png", "My Account"),
               _buildRow("images/settings.png", "Settings"),
               _buildRow("images/contact-us.png", "Contact Us"),
@@ -312,66 +314,115 @@ class _SellerDrawerState extends State<SellerDrawer> {
           if (User.userData.userResult.securityEnabled == true) {
             if (title == 'Home') {
               User.userData.drawerItem = "Home";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, SellerHome());
             } else if (title == 'Order Received') {
               User.userData.drawerItem = "Order Received";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, OrderManagement());
             } else if (title == 'Conversations') {
               User.userData.drawerItem = "Conversations";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               // AppRoutes.push(context, Conversation());
             } else if (title == 'Bundle Items') {
               User.userData.drawerItem = "Bundle Items";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               // AppRoutes.push(context, BundleItemsSeller());
             } else if (title == 'Payment Method') {
               User.userData.drawerItem = "Payment Method";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, PaymentMethod());
             } else if (title == 'Inventory Management') {
               User.userData.drawerItem = "Inventory Management";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
+              
               //AppRoutes.push(context, InventoryManagementSeller());
             } else if (title == 'Expenses') {
               User.userData.drawerItem = "Expenses";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, Expenses());
             } else if (title == 'Reports') {
               User.userData.drawerItem = "Reports";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, ReportsSeller());
             } else if (title == 'History') {
               User.userData.drawerItem = "History";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, SellerHistory());
             } else if (title == 'Wallet') {
               User.userData.drawerItem = "Wallet";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, WalletSeller());
             } else if (title == 'My Account') {
               User.userData.drawerItem = "My Account";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, MyAccountSeller());
             } else if (title == 'Contact Us') {
               User.userData.drawerItem = "Contact Us";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, ContactUs());
             } else if (title == 'Marketplace') {
               User.userData.drawerItem = "Marketplace";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               // AppRoutes.push(context, PurchaseProduct());
             } else if (title == 'My Orders') {
               User.userData.drawerItem = "My Orders";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, SellerOrders());
             } else if (title == 'Cashier') {
               User.userData.drawerItem = "Cashier";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, Cashier());
             } else if (title == 'Settings') {
               User.userData.drawerItem = "Settings";
+              setState(() {
+                pin.clear();
+              });
               _showDialog();
               //AppRoutes.push(context, SellerSettings());
             } else {
@@ -562,7 +613,7 @@ class _SellerDrawerState extends State<SellerDrawer> {
                     alignment: Alignment.center,
                     child: Container(
                         child: Text(
-                      "Input to set your pin",
+                      "Input Pin",
                       textAlign: TextAlign.center,
                       style:
                           TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
@@ -612,6 +663,7 @@ class _SellerDrawerState extends State<SellerDrawer> {
       child: TextFormField(
           enabled: label == "Pin" ? true : false,
           controller: _controller,
+          maxLength: 4,
           inputFormatters: <TextInputFormatter>[
             WhitelistingTextInputFormatter.digitsOnly
           ],
@@ -621,6 +673,7 @@ class _SellerDrawerState extends State<SellerDrawer> {
           },
           decoration: InputDecoration(
             filled: true,
+            counterText: "",
             fillColor: HexColor("#FFFFFF"),
             hintText: "$label",
             hintStyle: TextStyle(fontSize: 14, color: Colors.black54),

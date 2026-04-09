@@ -14,6 +14,7 @@ import 'package:transact/Model/personalInfomodel.dart';
 import 'package:transact/Seller/deliveryCost.dart';
 import 'package:transact/Seller/settings.dart';
 import 'package:transact/Supplier/headdetail.dart';
+import 'package:transact/changepass.dart';
 import 'package:transact/utils/routes.dart';
 import 'package:transact/utils/shippingaddress.dart';
 import 'package:transact/utils/utils.dart';
@@ -90,9 +91,61 @@ GetPersonalInfo   getPersonalInfo=GetPersonalInfo();
     }
   }
 
-     
+            getdeliveryCost() async {
+    pr.show();
+    var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+    print(header);
+    var response = await http.get(
+      "${API.getUserSettings}",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if (response.statusCode == 200) {
+      if (Json['Data']['WithError'] == true) {
+        pr.dismiss();
+        Fluttertoast.showToast(
+            msg: "no Delivery Cost found",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+      } else {
+        pr.dismiss();
+        setState(() {
+          User.userData.deliveryCost = "${Json['Data']['Result']['DeliveryCost']}";
+          User.userData.minOrder = "${Json['Data']['Result']['MinOrder']}";
+        //   User.userData.deliveryCost = Json['Data']['Result']['DeliveryCost'];
+        //  User.userData.sellerDeivery = Json['Data']['Result']['SellerDelivery'];
+        //   User.userData.buyerPickup = Json['Data']['Result']['BuyerPickup'];
+        //    User.userData.onlineDelivery = Json['Data']['Result']['OnlineDelivery'];
+        //    User.userData.isdeliveryFree = Json['Data']['Result']['IsDeliveryFree'];
+        //    User.userData.addressLine=Json['Data']['Result']['Address'];
+           AppRoutes.push(context, DeliveryCost());
+          
+          //AppRoutes.replace(context, BuyerAdress());
+          // cartFount=true;
+          // cartModel=CartModel.fromJson(Json['Data']);
+        });
+        // for(int i=0;i<cartModel.result.length;i++)
+        // {
+        //   setState(() {
+        //     total=total+cartModel.result[i].lineTotal;
+        //   });
+        // }
+      }
+    } else {
+      pr.dismiss();
+      Fluttertoast.showToast(
+          msg: "Status Code: ${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+  }
+
       getImage() async
       {
+
         var Image=await ImagePicker.pickImage(source: ImageSource.gallery).then((onValue)
         {
           setState(() {
@@ -478,17 +531,51 @@ GetPersonalInfo   getPersonalInfo=GetPersonalInfo();
                 ),
                 _buildRow("images/userman.png", "Personal Information"),
                 _buildRow("images/cards.png", "Bank Account Details"),
-                _buildRow("images/userman.png", "Head Information"),
-                _buildRow("images/cart4.png", "Shop Details"),
+                _buildRow("images/userman.png", "Expense Category"),
+               // _buildRow("images/cart4.png", "Shop Details"),
                 _buildRow("images/givinghand.png", "Delivery Cost"),
                 //_buildRow("images/givinghand.png", "Shipping Address"),
               ],
             ),
-          )
+          ),
+          changePass(),
         ],
       ),
     );
   }
+Widget changePass()
+{
+  return GestureDetector(
+    onTap: ()
+    {
+      AppRoutes.push(context, ChangePassword());
+    },
+    child:   Container(
+    width: MediaQuery.of(context).size.width,
+    height: MediaQuery.of(context).size.height*.07,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      //border: Border.all(color:Colors.green,width:1),
+      borderRadius: BorderRadius.all(Radius.circular(8))
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+             Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text("Change password",
+             style: style1.copyWith(color: Colors.black)
+            ,),
+            Icon(Icons.settings),
+          ],
+        ),
+      
+      ],
+    ),
+  )
+  );
+}
 
   void toggleSwitch(bool value) {
     
@@ -535,6 +622,7 @@ GetPersonalInfo   getPersonalInfo=GetPersonalInfo();
 
         setState(() {
           getPersonalInfo=GetPersonalInfo();
+          User.userData.getPersonalInfo=getPersonalInfo;
         });
         AppRoutes.push(context, BuyerShippingAdress());
         //  Fluttertoast.showToast(
@@ -561,13 +649,13 @@ GetPersonalInfo   getPersonalInfo=GetPersonalInfo();
         text == "Personal Information"
             ? getPersonal()
             : print("$text");
-            if(text=="Head Information")
+            if(text=="Expense Category")
             {
               AppRoutes.push(context, HeadDetail());
             }
             else if(text=="Delivery Cost")
             {
-              AppRoutes.push(context, DeliveryCost());
+              getdeliveryCost();
             }
             // else if(text=="Shipping Address")
             // {

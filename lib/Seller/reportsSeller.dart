@@ -7,10 +7,16 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:transact/AppBar.dart';
 import 'package:transact/Model/apismodel.dart';
 import 'package:transact/Model/getauthentication.dart';
+import 'package:transact/Model/ordermodel.dart';
+import 'package:transact/Model/totalexpansemodel.dart';
+import 'package:transact/Seller/HistorySeller.dart';
+import 'package:transact/Seller/expansedetail.dart';
+import 'package:transact/Supplier/wallet.dart';
 import 'package:transact/utils/bottomButton.dart';
 import 'package:transact/utils/fonts.dart';
 import 'package:transact/utils/graphs.dart';
 import 'package:http/http.dart' as http;
+import 'package:transact/utils/routes.dart';
 import 'dart:convert';
 import 'package:transact/utils/togglebuttons.dart';
 import 'package:transact/utils/utils.dart';
@@ -28,7 +34,10 @@ class _ReportsSellerState extends State<ReportsSeller> {
     'Total Expense'
   ];
   ProgressDialog pr;
-  DateTime sDate, eDate;
+  OrderModel orderModel=OrderModel();
+  TotalExpanseModel totalExpanseModel=TotalExpanseModel();
+  DateTime d=DateTime.now();
+  DateTime sDate=DateTime.now(), eDate=DateTime.now();
   DateTime currentDate = DateTime.now();
   var _scaffoldKey = GlobalKey<ScaffoldState>();
   String _selectedCatagory;
@@ -36,13 +45,206 @@ class _ReportsSellerState extends State<ReportsSeller> {
   TextEditingController _dateController;
   List<bool> _selection = [true, false, false, false];
   bool bottomSheet = false;
+  bool profit=false,texpanse=true;
+  bool expanseCheck=false,saleCheck=false,purchaseCheck=false;
   String totalPurchase = "0",
       totalSale = "0",
       totalSaleCount = "0",
       totalPurchaseCount = "0";
-  getReport(BuildContext context, String sDate, String eDate) async {
-    print("start date: " + sDate);
-    print("end date: " + eDate);
+
+getPurchaseHistory(
+  DateTime sDate, DateTime eDate
+) async {
+  if(sDate==null || eDate==null)
+  {
+    Fluttertoast.showToast(
+          msg: "Please select date first",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+  }
+  else
+  {
+    pr.show();
+    var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+    print(header);
+    var response = await http.get(
+      "${API.TotalPurchaseHistory}?startDate=$sDate&endDate=$eDate",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if (response.statusCode == 200) {
+      if (Json['Data']['WithError'] == false) {
+        pr.dismiss();
+        setState(() {
+          orderModel=OrderModel.fromJson(Json['Data']);
+          purchaseCheck=true;
+        });
+      } else {
+        pr.dismiss();
+        Fluttertoast.showToast(
+            msg: "${Json['data']['ShortMessage']}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+
+        setState(() {
+          orderModel = OrderModel();
+        });
+      }
+    } else {
+      pr.dismiss();
+      Fluttertoast.showToast(
+          msg: "response status: ${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+  } 
+  }
+
+
+
+getSaleHistory(
+  DateTime sDate, DateTime eDate
+) async {
+  if(sDate==null || eDate==null)
+  {
+    Fluttertoast.showToast(
+          msg: "Please select date first",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+  }
+  else
+  {
+    pr.show();
+    var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+    print(header);
+    var response = await http.get(
+      "${API.TotalSaleHistory}?startDate=$sDate&endDate=$eDate",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if (response.statusCode == 200) {
+      if (Json['Data']['WithError'] == false) {
+        pr.dismiss();
+        setState(() {
+          orderModel = OrderModel.fromJson(Json['Data']);
+          saleCheck=true;
+        });
+      } else {
+        pr.dismiss();
+        Fluttertoast.showToast(
+            msg: "${Json['data']['ShortMessage']}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+
+        setState(() {
+          orderModel = OrderModel();
+        });
+      }
+    } else {
+      pr.dismiss();
+      Fluttertoast.showToast(
+          msg: "response status: ${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+  } 
+  }
+
+
+
+getExpanseReport(
+  DateTime sDate, DateTime eDate
+) async {
+  if(sDate==null || eDate==null)
+  {
+    Fluttertoast.showToast(
+          msg: "Please select date first",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+  }
+  else
+  {
+    pr.show();
+    var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+    print(header);
+    var response = await http.get(
+      "${API.TotalExpanse}?startingDate=$sDate&endingDate=$eDate",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if (response.statusCode == 200) {
+      if (Json['Data']['WithError'] == false) {
+        pr.dismiss();
+        setState(() {
+          totalExpanseModel = TotalExpanseModel.fromJson(Json['Data']);
+          expanseCheck=true;
+        });
+      } else {
+        pr.dismiss();
+        Fluttertoast.showToast(
+            msg: "${Json['data']['ShortMessage']}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+
+        setState(() {
+          totalExpanseModel = TotalExpanseModel();
+          expanseCheck=false;
+        });
+      }
+    } else {
+      pr.dismiss();
+      Fluttertoast.showToast(
+          msg: "response status: ${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+  } 
+  }
+ getRep(DateTime sDate, DateTime eDate) async {
+    print("start date: " + sDate.toString());
+    print("end date: " + eDate.toString());
+    // pr.show();
+    var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+    print(header);
+    var response = await http.get(
+      "${API.ReportApi}?startDate=$sDate&endDate=$eDate",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if (response.statusCode == 200) {
+      //pr.dismiss();
+      setState(() {
+        totalPurchase = Json['TotalPurchaseAmount'].toString();
+        totalSale = Json['TotalSaleAmount'].toString();
+        totalPurchaseCount = Json['TotalPurchaseCount'].toString();
+        totalSaleCount = Json['TotalSaleCount'].toString();
+
+      });
+      print(totalPurchase + totalPurchaseCount + totalSale + totalSaleCount);
+    } else {
+      
+       Fluttertoast.showToast(
+          msg: "${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+  }
+
+  getReport(DateTime sDate, DateTime eDate) async {
+    print("start date: " + sDate.toString());
+    print("end date: " + eDate.toString());
     pr.show();
     var header = {
       "Authorization": AuthenticationUser.getAuthentication(),
@@ -77,7 +279,7 @@ class _ReportsSellerState extends State<ReportsSeller> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    //getReport();
+    getRep(sDate,eDate);
   }
 
   @override
@@ -101,17 +303,18 @@ class _ReportsSellerState extends State<ReportsSeller> {
           bottomSheet: bottomSheet == true ? _bottomSheet() : null,
           backgroundColor: HexColor("#F5F7FA"),
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(120),
+            preferredSize: Size.fromHeight(80),
             child: CustomeAppBar(
               homepage: false,
               title: "Reports",
-              suffixIcon: "images/applyfilter.png",
-              suffix: true,
-              suffixOnTap: () {
-                setState(() {
-                  bottomSheet = true;
-                });
-              },
+              // suffixIcon: "images/applyfilter.png",
+              // suffix: true,
+              // suffixOnTap: () {
+              //   setState(() {
+              //     bottomSheet = true;
+              //   });
+              // },
+              // child: Buttons(),
               // child: ToggleButton(
               //   isSelected: _selection,
               //   child1Title: "Today",
@@ -136,6 +339,7 @@ class _ReportsSellerState extends State<ReportsSeller> {
               // ),
             ),
           ),
+         
           body: Column(
             children: <Widget>[
               Row(
@@ -231,8 +435,8 @@ class _ReportsSellerState extends State<ReportsSeller> {
                                 eDate = null;
                                 sDate = null;
                               } else {
-                                getReport(context, sDate.toString(),
-                                    eDate.toString());
+                                getReport(sDate,
+                                    eDate);
                                 //pr.show();
                                 // if(sales==true)
                                 // {
@@ -297,20 +501,357 @@ class _ReportsSellerState extends State<ReportsSeller> {
                   ),
                 ],
               ),
+             
               _salenPurchase(),
               _selection[0]
                   ? Column(children: <Widget>[
-                      BarChartSample5(),
+                      //BarChartSample5(),
                       _orderReceive("Order Received", "$totalSaleCount"),
                       _orderReceive("Order Sent", "$totalPurchaseCount"),
                     ])
                   : Column(children: <Widget>[
                       _orderReceive("Order Received", "149"),
                       _orderReceive("Order Sent", "691"),
-                      BarChartSample5()
-                    ])
+                     // BarChartSample5()
+                    ]),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: ()
+                        {
+                          AppRoutes.push(context, ExpenseDetail());
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(top:10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            color: Colors.white,
+                          ),
+                          width: MediaQuery.of(context).size.width*.8,
+                          height: MediaQuery.of(context).size.height*.1,
+                          child: Center(
+                            child: Text("Expense Detail",style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      GestureDetector(
+                        onTap: ()
+                        {
+                          AppRoutes.push(context, Wallet());
+                        },
+                        child: Container(
+                          margin: EdgeInsets.only(top:10),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            color: Colors.white,
+                          ),
+                          width: MediaQuery.of(context).size.width*.8,
+                          height: MediaQuery.of(context).size.height*.1,
+                          child: Center(
+                            child: Text("Account Detail",style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                            ),),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+           
+            //   expanseCheck==true?
+            //   Padding(
+            //     padding: EdgeInsets.only(left:14,right:8),
+            //     child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: <Widget>[
+            //       Text("Date",style: TextStyle(
+            //         color: Colors.black,fontSize: 18,
+            //         fontWeight: FontWeight.bold
+            //       ),),
+            //       Text("      Quantity",style: TextStyle(
+            //         color: Colors.black,fontSize: 18,
+            //         fontWeight: FontWeight.bold
+            //       ),),
+            //        Text("Price",style: TextStyle(
+            //         color: Colors.black,fontSize: 18,
+            //         fontWeight: FontWeight.bold
+            //       ),),
+            //        Text("Total ",style: TextStyle(
+            //         color: Colors.black,fontSize: 18,
+            //         fontWeight: FontWeight.bold
+            //       ),),
+            //     ],
+            //   ),
+            //   )
+            //   :
+            //   saleCheck==true?
+            //    Padding(
+            //     padding: EdgeInsets.only(left:14,right:8),
+            //     child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: <Widget>[
+            //       Text("Date",style: TextStyle(
+            //         color: Colors.black,fontSize: 18,
+            //         fontWeight: FontWeight.bold
+            //       ),),
+            //       Text("      Order Number",style: TextStyle(
+            //         color: Colors.black,fontSize: 18,
+            //         fontWeight: FontWeight.bold
+            //       ),),
+            //        Text("Total Bill",style: TextStyle(
+            //         color: Colors.black,fontSize: 18,
+            //         fontWeight: FontWeight.bold
+            //       ),),
+                   
+            //     ],
+            //   ),
+            //   ):
+           
+            //  purchaseCheck==true?
+            //      Padding(
+            //     padding: EdgeInsets.only(left:14,right:8),
+            //     child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: <Widget>[
+            //       Text("Date",style: TextStyle(
+            //         color: Colors.black,fontSize: 18,
+            //         fontWeight: FontWeight.bold
+            //       ),),
+            //       Text("      Order Number",style: TextStyle(
+            //         color: Colors.black,fontSize: 18,
+            //         fontWeight: FontWeight.bold
+            //       ),),
+            //        Text("Total Bill",style: TextStyle(
+            //         color: Colors.black,fontSize: 18,
+            //         fontWeight: FontWeight.bold
+            //       ),),
+                   
+            //     ],
+            //   ),
+            //   ):
+            //   Text(""),
+              // Expanded(
+              //   child: ListView.builder(itemBuilder: (BuildContext context,int index)
+              //   {
+              //     return 
+              //     saleCheck==true?
+              //     totalSaleList(index):
+              //     purchaseCheck==true?
+              //     totalSaleList(index)
+              //     :
+              //     totalExpanseList(index);
+              //   },
+              //   itemCount: 
+              //   saleCheck==true?
+              //   orderModel.result!=null?orderModel.result.length:0
+              //   :
+              //   purchaseCheck==true?
+              //   orderModel.result!=null?orderModel.result.length:0
+              //   :
+              //   totalExpanseModel.result!=null?totalExpanseModel.result.length:0,
+              //   ),
+              // ),
+           
             ],
-          )),
+          )
+
+          ),
+    );
+  }
+
+Widget totalSaleList(int index)
+{
+  return Container(
+    
+    color: Colors.white,
+    width: MediaQuery.of(context).size.width,
+    margin: EdgeInsets.only(left:10,right:2,top:10),
+    height: 40,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Expanded(
+              flex: 3,
+              child:Text("${orderModel.result[index].date}",style: TextStyle(
+                    color: Colors.black,fontSize: 14,
+                    //fontWeight: FontWeight.bold
+                  ),),
+            ),
+             Expanded(
+              flex: 4,
+              child:Text("${orderModel.result[index].orderNumber}",style: TextStyle(
+                    color: Colors.black,fontSize: 14,
+                    //fontWeight: FontWeight.bold
+                  ),),
+            ),
+             Expanded(
+              flex: 2,
+              child:Text("    \$${orderModel.result[index].totalBill}",style: TextStyle(
+                    color: Colors.black,fontSize: 14,
+                    //fontWeight: FontWeight.bold
+                  ),),
+            ),
+           
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+
+Widget totalExpanseList(int index)
+{
+  return Container(
+    
+    color: Colors.white,
+    width: MediaQuery.of(context).size.width,
+    margin: EdgeInsets.only(left:10,right:2,top:10),
+    height: 40,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Expanded(
+              flex: 4,
+              child:Text("${totalExpanseModel.result[index].date}",style: TextStyle(
+                    color: Colors.black,fontSize: 14,
+                    //fontWeight: FontWeight.bold
+                  ),),
+            ),
+             Expanded(
+              flex: 3,
+              child:Text("${totalExpanseModel.result[index].qty}",style: TextStyle(
+                    color: Colors.black,fontSize: 14,
+                    //fontWeight: FontWeight.bold
+                  ),),
+            ),
+             Expanded(
+              flex: 3,
+              child:Text("${totalExpanseModel.result[index].price}",style: TextStyle(
+                    color: Colors.black,fontSize: 14,
+                    //fontWeight: FontWeight.bold
+                  ),),
+            ),
+            Expanded(
+              flex: 1,
+              child:Text("${totalExpanseModel.result[index].total}",style: TextStyle(
+                    color: Colors.black,fontSize: 14,
+                    //fontWeight: FontWeight.bold
+                  ),),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+ Widget Buttons() {
+    return Container(
+      margin: EdgeInsets.only(top: 10, bottom: 2),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * .06,
+      decoration: BoxDecoration(
+          color:  HexColor("#3B444B"),
+          // border: Border.all(color: Colors.blueGrey, width: 1),
+          // borderRadius: BorderRadius.all(Radius.circular(10))
+          ),
+      child: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                 profit=false;
+                 texpanse=true;
+                 saleCheck=false;
+                 purchaseCheck=false;
+                 expanseCheck=true;
+                });
+                getExpanseReport(sDate,eDate);
+               // getRejectedList();
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width * .23,
+                height: MediaQuery.of(context).size.height * .06,
+                decoration: BoxDecoration(
+                    color:
+                    texpanse==true?
+                    Colors.white
+                    :
+                       HexColor("#3B444B") ,
+                    border: Border.all(color: Colors.blueGrey, width: 1),
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Center(
+                  child: Text(
+                    "T.Expanse",
+                    style: TextStyle(
+                        color: 
+                        texpanse==true?
+                        HexColor("#3B444B")
+                        :
+                        Colors.white,
+                           
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                 profit=true;
+                 texpanse=false;
+                });
+               // getRejectedList();
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width * .23,
+                height: MediaQuery.of(context).size.height * .06,
+                decoration: BoxDecoration(
+                    color:
+                       profit==true?
+                    Colors.white
+                    :
+                       HexColor("#3B444B"),
+                    border: Border.all(color: Colors.blueGrey, width: 1),
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+                child: Center(
+                  child: Text(
+                    "Profit/Loss",
+                    style: TextStyle(
+                         color: 
+                        profit==true?
+                        HexColor("#3B444B")
+                        :
+                        Colors.white,
+                            
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+         
+          ],
+        ),
+      ),
     );
   }
 
@@ -330,7 +871,9 @@ class _ReportsSellerState extends State<ReportsSeller> {
 
   Widget _amountButton(String text, String image) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+      AppRoutes.push(context, SellerHistory());
+      },
       child: Container(
         height: MediaQuery.of(context).size.height * .2,
         width: MediaQuery.of(context).size.width / 2.9,

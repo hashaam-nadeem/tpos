@@ -107,7 +107,7 @@ class _CashierState extends State<Cashier> {
         "Price":"${marketPlaceModel.result[i].actualPrice}",
         "LineTotal": "$lineTotal",
         "ProductId": "${marketPlaceModel.result[i].id}",
-        "pin":"${User.userData.pin}",
+        "pin":"${User.userData.rememberPin}",
       };
       var response = await http.post(
         "${API.cashierAddToCart}",
@@ -129,7 +129,10 @@ class _CashierState extends State<Cashier> {
           // } else {
           //   AppRoutes.push(context, BuyerCart());
           // }
-
+          //  Fluttertoast.showToast(
+          //     msg: "${User.userData.rememberPin}",
+          //     textColor: Colors.white,
+          //     backgroundColor: Colors.blueGrey);
           Fluttertoast.showToast(
               msg: "${Json['Data']['ShortMessage']}",
               textColor: Colors.white,
@@ -329,7 +332,7 @@ void _incrementAmount(String productId) {
       staggeredTileBuilder: (int index) =>
           new StaggeredTile.count(
             2,
-             index.isEven ? 2.7 : 2.9),
+             index.isEven ? 3.2 : 3.4),
                    mainAxisSpacing: 7.0,
       crossAxisSpacing: 7.0,
       
@@ -372,7 +375,22 @@ void _incrementAmount(String productId) {
                          fit: BoxFit.cover,
                         ),
                   ),
-                  Container(
+                Container(
+                 // margin: EdgeInsets.only(left:17),
+                  child:   Text(
+                          "${marketPlaceModel.result[countID].name}",
+                          style: TextStyle(
+                              color: HexColor("#3B444B"),
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'CaviarDreams'),
+                        ),
+                ),
+
+                 Row(
+                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                   children: <Widget>[
+                      Container(
                     margin: EdgeInsets.only(left:17),
                     child: Row(
                       children: <Widget>[
@@ -410,9 +428,20 @@ void _incrementAmount(String productId) {
                                     fontFamily: 'CaviarDreams'),
                               ),
                         
+                        Text(
+                                " min ord(${marketPlaceModel.result[countID].minOrder})",
+                                style: TextStyle(
+                                    color: HexColor("#515C6F"),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'CaviarDreams'),
+                              )
                       ],
                     ),
                   ),
+                 
+                   ],
+                 ),
                   // Container(
                   //   margin: EdgeInsets.only(top: 5),
                   //   child: Row(

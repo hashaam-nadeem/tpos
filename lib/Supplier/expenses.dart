@@ -220,10 +220,17 @@ class _ExpensesState extends State<Expenses> {
           Align(
             alignment: Alignment.bottomRight,
             child: Text(
-              "\$${ journalModel.result[index].price}",
+              "\$${ journalModel.result[index].total}",
               style: style,
             ),
-          )
+          ),
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: Text(
+              "${ journalModel.result[index].num}",
+              style: style,
+            ),
+          ),
         ],
       ),
     );

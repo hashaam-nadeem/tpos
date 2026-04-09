@@ -126,11 +126,11 @@ ProgressDialog pr;
             preferredSize: Size.fromHeight(70),
             child: CustomeAppBar(
               homepage: false,
-              title: "Head Detail",
+              title: "Category Detail",
             ),
           ),
            bottomNavigationBar: BottomButton(
-            name: "+ ADD NEW HEAD",
+            name: "+ ADD NEW CATEGORY",
             ontap: () {
                AppRoutes.push(context, CreateHead());
             },
@@ -285,7 +285,7 @@ ProgressDialog pr;
                 ),
                 headersModel.result[index].type==1?
                 Text(
-                  "Expanse",
+                  "Expense",
                   style: style.copyWith(fontSize: 12),
                 )
                 :

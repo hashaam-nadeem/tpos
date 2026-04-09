@@ -14,10 +14,11 @@ class AdminChat extends StatefulWidget {
   final String name;
   final String pic;
   final String peerid;
+  final String userName;
    String type="driver";
    
 
-  AdminChat({this.name,this.pic,this.peerid,this.type});
+  AdminChat({this.name,this.userName,this.pic,this.peerid,this.type});
 
   @override
   _CustomerChatBoxState createState() => _CustomerChatBoxState();
@@ -26,7 +27,7 @@ class AdminChat extends StatefulWidget {
 class _CustomerChatBoxState extends State<AdminChat> {
   final ScrollController listScrollController = new ScrollController();
   TextEditingController _controller = TextEditingController();
-String token;
+var token;
 final String serverToken="AAAA650MzzU:APA91bGRkwiShIXSR2Yim26Eo_qG_ApsOk4F5tpPn9KPpA2KAzJquI35hNERF4UzZNJnW5lv1qme5O5c8Z_IJvb70ZGBToj4bv3OaTWWtpp5oQSJ3zTZOC6Li8g1ZMuI6V-uvcAYQtvW";
 final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
 getFcmToken() async
@@ -36,7 +37,7 @@ getFcmToken() async
       "Authorization": AuthenticationUser.getAuthentication(),
     };
     var response = await http.get(
-      "${API.getFcm}?UserId${widget.peerid}",
+      "${API.getFcm}?UserId=${widget.peerid}",
       headers: header,
     );
     var Json=json.decode(response.body);
@@ -48,7 +49,7 @@ getFcmToken() async
         if(Json['Data']['Result']!=null)
         {
           setState(() {
-            token=Json['Data']['Result']['FCM'];
+            token=Json['Data']['Result'];
           });
           print(token);
         }
@@ -218,9 +219,10 @@ Future<Map<String, dynamic>> sendAndRetrieveMessage() async {
         "chat_with": widget.peerid,
         "timestamp": timeStamp,
         "type": "${widget.type}",
+        "userName":"${widget.userName}",
         "pic": widget.pic,
         "last_message": "$message",
-        "name": widget.name
+        "name": widget.userName
       });
       Firestore.instance.collection("ChatInbox").document(widget.peerid).collection("chat_user").document(User.userData.userResult.id).setData({
         "chat_with": User.userData.userResult.id,
@@ -228,7 +230,7 @@ Future<Map<String, dynamic>> sendAndRetrieveMessage() async {
         "type": "admin",
         "pic": User.userData.userResult.imageUrl,
         "last_message": "$message",
-        "name": "${widget.name}"
+        "name": "${widget.userName}"
       });
       var timestamp = DateTime
           .now()
@@ -276,7 +278,7 @@ Future<Map<String, dynamic>> sendAndRetrieveMessage() async {
             borderRadius: BorderRadius.circular(20),
             child: Image.network(
               "${API.API_URL}${widget.pic}",height: 40,width: 40,
-              fit: BoxFit.contain,
+              fit: BoxFit.cover,
             ),
           ),
         ):value.data.documents[index-1]["id_from"]==User.userData.userResult.id?Padding(

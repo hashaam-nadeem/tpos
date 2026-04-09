@@ -2,6 +2,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:transact/AppBar.dart';
 import 'package:transact/Model/apismodel.dart';
 import 'package:transact/Model/getauthentication.dart';
@@ -22,6 +23,7 @@ class _Wallet extends State<Wallet> {
       fontSize: 20, fontWeight: FontWeight.bold, color: HexColor("#1C1C1C"));
   List<bool> _selection = [true, false];
   double sale = 0, received = 0, remaining = 0;
+  final RefreshController _refreshController = RefreshController();
 
   getwallet() async {
     var header = {
@@ -40,7 +42,9 @@ class _Wallet extends State<Wallet> {
         received = Json['Data']['Result']['Received'];
         remaining = Json['Data']['Result']['Remaining'];
       });
-    } else {}
+    } else {
+
+    }
   }
 
   @override
@@ -58,11 +62,20 @@ class _Wallet extends State<Wallet> {
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(120),
             child: CustomeAppBar(
-              title: "Wallet",
+              title: "Account Detail",
               //child: _toggleButtons(),
             ),
           ),
-          body: _body()),
+          body: SmartRefresher(
+
+            controller: _refreshController,
+            child: _body(),
+             onRefresh: () async {
+              await Future.delayed(Duration(seconds: 3));
+              getwallet();
+              _refreshController.refreshCompleted();
+            },
+          )),
     );
   }
 
@@ -180,8 +193,10 @@ class _Wallet extends State<Wallet> {
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              alignment: Alignment.bottomCenter,
+            child: 
+            Container(
+             // margin: EdgeInsets.only(top:30),
+              //alignment: Alignment.bottomCenter,
               height: MediaQuery.of(context).size.height / 2,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
@@ -201,6 +216,9 @@ class _Wallet extends State<Wallet> {
                     //     margin:
                     //         EdgeInsets.symmetric(vertical: 10, horizontal: 60),
                     //     child: _datePicker()),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height*.1,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -217,6 +235,7 @@ class _Wallet extends State<Wallet> {
                 ),
               ),
             ),
+          
           ),
         ],
       ),

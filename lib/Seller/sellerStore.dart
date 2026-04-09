@@ -26,17 +26,16 @@ class SellerDetails extends StatefulWidget {
 
 class _SupplierDetails extends State<SellerDetails> {
   bool store = false;
-  int storeSelected=5;
-  int storeSelected1=5;
-  String storeAddress="";
-  int provideDelivery=5;
-  int hasPhysicalStore=5;
+  bool sellingTypeProduct = false,
+      physicalstoreYes = false,
+      physicalstoreNo = false,
+      sellingTypeService = false;
   bool card = false;
   bool delivery = false;
   bool willDeliver = false;
   String ownDelivery = "No";
   String selling = "Product";
-  String selling1="Service";
+  String selling1 = "Service";
   ProgressDialog pr;
   final storeName = TextEditingController();
   // final storeAddress = TextEditingController();
@@ -45,32 +44,30 @@ class _SupplierDetails extends State<SellerDetails> {
   String physicalStoreSelected = "No";
   final email = TextEditingController();
   final addAbn = TextEditingController();
-  int deliverySetting = 0;
+  bool productSelected = false;
+  bool serviceSelected = false;
+  bool buyerCollection = false;
+  bool thirdParty = false;
+  bool supplierDeliverProduct = false;
 
-  updateElementoryProfile() async {
 
-    if(User.userData.lat==0.0)
-    {
-      Fluttertoast.showToast(
-            msg: "Please select address",
-            textColor: Colors.white,
-            backgroundColor: Colors.blueGrey);
-    }
-    else
-    {
-      pr.show();
+callapiFunc()async
+{
+  pr.show();
     var body = {
-      "IsPhysicalStoreExist": "$physicalStore",
-      "DeliverySetting": "$deliverySetting",
-      "SellingProductType": selling == "Product" && selling1=="Service"? "2" 
-      :storeSelected==5? "1":storeSelected1==5?"0":"0",
+      "IsPhysicalStoreExist": "$physicalstoreYes",
+      "SellingProductType": sellingTypeProduct==true && sellingTypeService==true?
+      "2":sellingTypeProduct==true?"0":sellingTypeService==true?"1":"0",
       "Storename": "${storeName.text.trim()}",
-      "Address": "$storeAddress",
+      "Address": "${User.userData.addressLine}",
       "Phone": "${phoneNo.text.trim()}",
       "Email": "${email.text.trim()}",
       "Adn": "${addAbn.text.trim()}",
       "Lat":"${User.userData.lat}",
       "Long":"${User.userData.long}",
+      "BuyerPickup":"$buyerCollection",
+      "SellerDelivery":"$supplierDeliverProduct",
+      "OnlineDelivery":"$thirdParty",
 
 
     };
@@ -104,8 +101,101 @@ class _SupplierDetails extends State<SellerDetails> {
           textColor: Colors.white,
           backgroundColor: Colors.blueGrey);
     }
-    }
+}
+  updateElementoryProfile() async {
+    if (sellingTypeProduct == false && sellingTypeService == false) {
+      Fluttertoast.showToast(
+          msg: "no Selling type selected",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    } 
     
+    else if(physicalstoreNo==false && physicalstoreYes==false)
+    {
+       Fluttertoast.showToast(
+          msg: "please select do you have physical store or not.",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+    else if (physicalstoreYes == true) {
+      if (storeName.text.isEmpty ||
+          phoneNo.text.isEmpty ||
+          email.text.isEmpty ||
+          addAbn.text.isEmpty) {
+        Fluttertoast.showToast(
+            msg: "Please enter the required fields.",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+      } else 
+      {
+        if(buyerCollection==false && supplierDeliverProduct==false && thirdParty==false)
+        {
+          Fluttertoast.showToast(
+              msg: "Please select options below",
+              textColor: Colors.white,
+              backgroundColor: Colors.blueGrey);
+        }
+        else
+        {
+          if (buyerCollection == true) {
+        if (User.userData.addressLine == "") {
+          Fluttertoast.showToast(
+              msg: "Please select the Address",
+              textColor: Colors.white,
+              backgroundColor: Colors.blueGrey);
+        } 
+        else {
+          callapiFunc();
+          print("call Api");
+        }
+      }  
+      else {
+          callapiFunc();
+          print("call Api");
+        }
+        }
+        
+      }
+      
+    } else {
+      if (storeName.text.isEmpty) {
+        Fluttertoast.showToast(
+            msg: "Please enter store name",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+      } else 
+      {
+        if(buyerCollection==false && supplierDeliverProduct==false && thirdParty==false)
+        {
+           Fluttertoast.showToast(
+              msg: "Please select the Options below",
+              textColor: Colors.white,
+              backgroundColor: Colors.blueGrey);
+        }
+       else
+       {
+          if (buyerCollection == true) {
+        if (User.userData.addressLine == "") {
+          Fluttertoast.showToast(
+              msg: "Please select address",
+              textColor: Colors.white,
+              backgroundColor: Colors.blueGrey);
+        }
+        else{
+          callapiFunc();
+        }
+      }
+       else {
+            callapiFunc();
+          print("call api");
+        }
+       }
+      }
+      
+      
+    }
+
+   
   }
 
   @override
@@ -131,50 +221,7 @@ class _SupplierDetails extends State<SellerDetails> {
           child: BottomButton(
             name: "PROCEED",
             ontap: () {
-              if(storeSelected==5)
-              {
-                Fluttertoast.showToast(
-                      msg: "Please select store",
-                      textColor: Colors.white,
-                      backgroundColor: Colors.blueGrey);
-              }
-              else if(physicalStoreSelected==5)
-              {
-                 Fluttertoast.showToast(
-                      msg: "Please select physical store",
-                      textColor: Colors.white,
-                      backgroundColor: Colors.blueGrey);
-              }
-              else if(provideDelivery==5)
-              {
-                Fluttertoast.showToast(
-                      msg: "Please select delivery method",
-                      textColor: Colors.white,
-                      backgroundColor: Colors.blueGrey);
-              }
-              print(physicalStore);
-              if (physicalStore == false) {
-                print(storeName.text.trim());
-                if (storeName.text.isEmpty) {
-                  Fluttertoast.showToast(
-                      msg: "Please enter Store Name",
-                      textColor: Colors.white,
-                      backgroundColor: Colors.blueGrey);
-                } else {
-                  updateElementoryProfile();
-                }
-              } else if (storeName.text.isEmpty ||
-                  storeAddress =="" ||
-                  email.text.isEmpty ||
-                  addAbn.text.isEmpty ||
-                  phoneNo.text.isEmpty) {
-                Fluttertoast.showToast(
-                    msg: "Please enter the Required Fields",
-                    textColor: Colors.white,
-                    backgroundColor: Colors.blueGrey);
-              } else {
-                updateElementoryProfile();
-              }
+              updateElementoryProfile();
             },
           ),
         ),
@@ -244,37 +291,85 @@ class _SupplierDetails extends State<SellerDetails> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text("What are you selling?", style: TextStyle(fontSize: 16)),
-              Row(children: [
-                RadioButtonGroup(
-                  orientation: GroupedButtonsOrientation.HORIZONTAL,
-                  labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                  activeColor: Colors.black,
-                  //picked: selling,
-                  labels: <String>["Product"],
-                  onSelected: (String selected) {
-                    setState(() {
-                      storeSelected=0;
-                      selling = selected;
-                    });
-                    // print(sellingProduct);
-                    //  print(sellingService);
-
-                    print(selected);
-                  },
+              SizedBox(
+                //width: 10,
+                height: 10,
+              ),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                Row(
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          productSelected = !productSelected;
+                          sellingTypeProduct = !sellingTypeProduct;
+                        });
+                      },
+                      child: Container(
+                        // margin: EdgeInsets.only(top:10),
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey, width: 1.5)),
+                        child: Center(
+                          child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: productSelected == true
+                                    ? Colors.black
+                                    : Colors.white,
+                              )),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                      //height: 10,
+                    ),
+                    Text("Product", style: TextStyle(color: Colors.black)),
+                  ],
                 ),
-                RadioButtonGroup(
-                    orientation: GroupedButtonsOrientation.HORIZONTAL,
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                    activeColor: Colors.black,
-                    labels: <String>[
-                      "Service",
-                    ],
-                    onSelected: (String selected) {
-                      setState(() {
-                        storeSelected1=1;
-                        selling1=selected;
-                      });
-                    }),
+                Row(
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          serviceSelected = !serviceSelected;
+                          sellingTypeService = !sellingTypeService;
+                        });
+                      },
+                      child: Container(
+                        // margin: EdgeInsets.only(top:10),
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey, width: 1.5)),
+                        child: Center(
+                          child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: serviceSelected == true
+                                    ? Colors.black
+                                    : Colors.white,
+                              )),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                      //height: 10,
+                    ),
+                    Text("Service", style: TextStyle(color: Colors.black)),
+                  ],
+                ),
               ]),
             ],
           ),
@@ -309,17 +404,20 @@ class _SupplierDetails extends State<SellerDetails> {
                       "No",
                     ],
                     onSelected: (String selected) {
-
-                      setState(() {
-                        hasPhysicalStore=0;
-                      });
+                      // setState(() {
+                      //   hasPhysicalStore=0;
+                      // });
                       selected == "Yes"
                           ? setState(() {
+                              physicalstoreYes = true;
+                              physicalstoreNo = false;
                               store = true;
                               card = true;
                               physicalStore = true;
                             })
                           : setState(() {
+                              physicalstoreYes = false;
+                              physicalstoreNo = true;
                               store = false;
                               card = true;
                               physicalStore = false;
@@ -347,31 +445,135 @@ class _SupplierDetails extends State<SellerDetails> {
               children: <Widget>[
                 Text("Do you provide your own delivery?",
                     style: TextStyle(fontSize: 16)),
-                RadioButtonGroup(
-                    orientation: GroupedButtonsOrientation.HORIZONTAL,
-                    labelStyle: TextStyle(fontWeight: FontWeight.bold),
-                    activeColor: Colors.black,
-                    //picked: ownDelivery,
-                    labels: <String>[
-                      "Yes",
-                      "No",
-                    ],
-                    onSelected: (String selected) {
-                      setState(() {
-                        provideDelivery=0;
-                      });
-                      selected == "Yes"
-                          ? setState(() {
-                              delivery = true;
-                              willDeliver = true;
-                              deliverySetting = 0;
-                            })
-                          : setState(() {
-                              delivery = true;
-                              willDeliver = false;
-                              deliverySetting = 1;
-                            });
-                    }),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          buyerCollection = !buyerCollection;
+                        });
+                      },
+                      child: Container(
+                        // margin: EdgeInsets.only(top:10),
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey, width: 1.5)),
+                        child: Center(
+                          child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: buyerCollection == true
+                                    ? Colors.black
+                                    : Colors.white,
+                              )),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                      //height: 10,
+                    ),
+                    Text("Seller will collect it from the store",
+                        style: TextStyle(color: Colors.black)),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                buyerCollection == true
+                    ? _addressLine('images/cart5.png')
+                    : Text(""),
+                Row(
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          thirdParty = !thirdParty;
+                        });
+                      },
+                      child: Container(
+                        // margin: EdgeInsets.only(top:10),
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey, width: 1.5)),
+                        child: Center(
+                          child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: thirdParty == true
+                                    ? Colors.black
+                                    : Colors.white,
+                              )),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                      //height: 10,
+                    ),
+                    Flexible(
+                      child: Text(
+                          "Seller will send it through third party courier",
+                          style: TextStyle(color: Colors.black)),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          supplierDeliverProduct = !supplierDeliverProduct;
+                        });
+                      },
+                      child: Container(
+                        // margin: EdgeInsets.only(top:10),
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey, width: 1.5)),
+                        child: Center(
+                          child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: supplierDeliverProduct == true
+                                    ? Colors.black
+                                    : Colors.white,
+                              )),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 10,
+                      //height: 10,
+                    ),
+                    Flexible(
+                      child: Text(
+                          "Seller will deliver the product or service",
+                          style: TextStyle(color: Colors.black)),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -401,19 +603,20 @@ class _SupplierDetails extends State<SellerDetails> {
                       if (selected == "Buyer will collect it from the store") {
                         print("collect from store");
                         setState(() {
-                          deliverySetting = 1;
+                          // deliverySetting = 1;
                         });
                       } else {
                         setState(() {
-                          deliverySetting = 2;
+                          //  deliverySetting = 2;
                         });
-                        print("seller sent it");
+                        print("Supplier sent it");
                       }
                       //print("$selected");
                     })
                 : Container(
                     padding: EdgeInsets.symmetric(vertical: 18),
-                    child: Text("Seller will deliver the product or service")),
+                    child:
+                        Text("Seller will deliver the product or service")),
           ],
         ));
   }
@@ -437,9 +640,9 @@ class _SupplierDetails extends State<SellerDetails> {
                 margin: EdgeInsets.only(top: store == true ? 15 : 5),
                 child:
                     _textField('images/cart5.png', 'Store Name', 2, storeName)),
-                    _addressLine('images/cart5.png'),
-                    //  _textField('images/mapmark.png', 'Store Address', 2,
-                    //       storeAddress),
+            //_addressLine('images/cart5.png'),
+            //  _textField('images/mapmark.png', 'Store Address', 2,
+            //       storeAddress),
             store == true
                 ? Column(
                     children: <Widget>[
@@ -459,49 +662,48 @@ class _SupplierDetails extends State<SellerDetails> {
           ],
         ));
   }
-  Widget _addressLine(String image, ) {
-    return 
-    GestureDetector(
-      onTap: ()
-      {
-        AppRoutes.push(context, StoreDetailAddress());
 
-      },
-      child: Container(
-      
-           margin: EdgeInsets.symmetric(vertical: 2,horizontal: 18),
-           
-      height: 50,
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        border: Border.all(color:HexColor("#707070"),width: 1),
-       // color: HexColor("#707070"),
-        borderRadius: BorderRadius.all(Radius.circular(10))
-      ),
-      child: Center(
-        child: Row(
-          children: <Widget>[
-            Image.asset("$image",scale: 3,),
-            SizedBox(
-              width: 10,
+  Widget _addressLine(
+    String image,
+  ) {
+    return GestureDetector(
+        onTap: () {
+          AppRoutes.push(context, StoreDetailAddress());
+        },
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 2, horizontal: 18),
+          height: 50,
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          decoration: BoxDecoration(
+              border: Border.all(color: HexColor("#707070"), width: 1),
+              // color: HexColor("#707070"),
+              borderRadius: BorderRadius.all(Radius.circular(10))),
+          child: Center(
+            child: Row(
+              children: <Widget>[
+                Image.asset(
+                  "$image",
+                  scale: 3,
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                User.userData.addressLine == ""
+                    ? Flexible(
+                        child: Text(
+                        "Store Address",
+                        style: TextStyle(fontSize: 14, color: Colors.black54),
+                      ))
+                    : Flexible(
+                        child: Text(
+                        "${User.userData.addressLine}",
+                        style: TextStyle(fontSize: 14, color: Colors.black54),
+                      ))
+              ],
             ),
-            User.userData.addressLine==""?
-            Flexible(
-              child: Text("Store Address",
-            style: TextStyle(fontSize: 14, color: Colors.black54),)
-            )
-            :
-            Flexible(
-              child: Text("${User.userData.addressLine}",
-            style: TextStyle(fontSize: 14, color: Colors.black54),)
-            )
-          ],
-        ),
-      ),
-    )
-    );
+          ),
+        ));
   }
-
 
   Widget _textField(String image, String label, id, _controller) {
     return Container(
@@ -542,7 +744,6 @@ class _SupplierDetails extends State<SellerDetails> {
       ),
     );
   }
-
 }
 
 // import 'package:flutter/material.dart';
@@ -844,8 +1045,6 @@ class _SupplierDetails extends State<SellerDetails> {
 //   }
 // }
 
-
-
 // import 'package:flutter/material.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:geocoder/geocoder.dart';
@@ -885,8 +1084,7 @@ class _SupplierDetails extends State<SellerDetails> {
 //   final email = TextEditingController();
 //   final addAbn = TextEditingController();
 //   int deliverySetting=0;
-  
-  
+
 // updateElementoryProfile() async
 // {
 // pr.show();
@@ -900,7 +1098,6 @@ class _SupplierDetails extends State<SellerDetails> {
 //       "Email": "${email.text.trim()}",
 //        "Adn": "${addAbn.text.trim()}",
 
-  
 //     };
 //     print(body);
 //     var header={
@@ -930,7 +1127,7 @@ class _SupplierDetails extends State<SellerDetails> {
 //               textColor: Colors.white,
 //               backgroundColor: Colors.blueGrey);
 //       }
-       
+
 //     }
 //     else
 //     {
@@ -955,7 +1152,7 @@ class _SupplierDetails extends State<SellerDetails> {
 //               color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
 //           messageTextStyle: TextStyle(
 //               color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600),
-//         ); 
+//         );
 //     return SafeArea(
 //       child: Scaffold(
 //         bottomNavigationBar: Container(
@@ -986,13 +1183,13 @@ class _SupplierDetails extends State<SellerDetails> {
 //               msg: "Please enter the Required Fields",
 //               textColor: Colors.white,
 //               backgroundColor: Colors.blueGrey);
-                
+
 //               }
 //               else
 //               {
 //                 updateElementoryProfile();
 //               }
-             
+
 //             },
 //           ),
 //         ),
@@ -1071,20 +1268,19 @@ class _SupplierDetails extends State<SellerDetails> {
 //                     labels: <String>[
 //                       "Product",
 //                       "Service"
-                      
+
 //                     ],
 //                     onSelected: (String selected) {
-                      
+
 //                         setState(() {
 //                          selling=selected;
 //                         });
 //                         // print(sellingProduct);
 //                         //  print(sellingService);
-                      
-                     
+
 //                       print(selected);
 //                     },
-                    
+
 //                     ),
 //                 // RadioButtonGroup(
 //                 //     orientation: GroupedButtonsOrientation.HORIZONTAL,
@@ -1127,7 +1323,7 @@ class _SupplierDetails extends State<SellerDetails> {
 //                       "Yes",
 //                       "No",
 //                     ],
-                    
+
 //                     onSelected: (String selected) {
 //                       selected == "Yes"
 //                           ? setState(() {
@@ -1189,7 +1385,7 @@ class _SupplierDetails extends State<SellerDetails> {
 //                       // selected == "Yes"
 //                       //     ? setState(() {
 //                       //         delivery = true;
-                              
+
 //                       //         willDeliver = true;
 //                       //       })
 //                       //     : setState(() {

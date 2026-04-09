@@ -27,11 +27,13 @@ class OrderResult {
   int paymentMethod;
   String date;
   var totalBill;
+  int deliveryType;
   int status;
   List<LineDetail> lineDetail;
 
   OrderResult(
       {this.status,
+      this.deliveryType,
       this.paymentMethod,
       this.orderNumber,
       this.lineDetail,
@@ -54,6 +56,7 @@ class OrderResult {
       date: json['Date'] ?? "",
       totalBill: json['TotalBill'] ?? 0.0,
       status: json['Status'] ?? 0,
+      deliveryType: json['DeliveryType'] ?? 0,
     );
   }
 }
@@ -81,7 +84,7 @@ class LineDetail {
       imageUrl: json['ProductImageUrl']??"",
       price: json['Price']??"",
       productCode: json['ProductCode']??"",
-      productName: json['ProductName']??"",
+      productName: json['CustomerName']??"",
       qty: json['Qty']??"",
       total: json['Total']??"",
     );

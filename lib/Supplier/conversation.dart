@@ -28,7 +28,6 @@ class _CustomerChatInboxState extends State<Conversation> {
   @override
   void initState() {
     super.initState();
-
   }
 
   @override
@@ -264,7 +263,7 @@ class _CustomerChatInboxState extends State<Conversation> {
                           borderRadius: BorderRadius.all(Radius.circular(30)),
                           child:  Image.network(
                             '${API.API_URL}${snapshot["pic"]}',
-                            fit: BoxFit.contain,
+                            fit: BoxFit.cover,
                           ),
                         )),
                     Container(

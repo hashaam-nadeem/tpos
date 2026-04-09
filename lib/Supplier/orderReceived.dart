@@ -249,10 +249,11 @@ class _OrderReceivedState extends State<OrderReceived> {
           bottomNavigationBar:
               order == true && !_selection[2] ? _bottom() : null,
           appBar: PreferredSize(
-            preferredSize: Size.fromHeight(70),
+            preferredSize: Size.fromHeight(125),
             child: CustomeAppBar(
               homepage: false,
               title: "Order Details",
+              child: Buttons(),
               // child: order == false
               //     ? Buttons
               //     : Container(),
@@ -264,12 +265,12 @@ class _OrderReceivedState extends State<OrderReceived> {
                   height: MediaQuery.of(context).size.height,
                   child: Column(
                     children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Buttons(),
-                        ],
-                      ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   children: <Widget>[
+                      //    // Buttons(),
+                      //   ],
+                      // ),
                       Expanded(
                           child: ListView.builder(
                         itemCount: orderModel.result != null
@@ -288,13 +289,14 @@ class _OrderReceivedState extends State<OrderReceived> {
 
   Widget Buttons() {
     return Container(
-      margin: EdgeInsets.only(top: 10, bottom: 10),
-      width: MediaQuery.of(context).size.width,
+      margin: EdgeInsets.only(top: 5, bottom: 2),
+      width: MediaQuery.of(context).size.width*.75,
       height: MediaQuery.of(context).size.height * .08,
       decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: Colors.blueGrey, width: 1),
-          borderRadius: BorderRadius.all(Radius.circular(10))),
+         //color: Colors.white,
+        // border: Border.all(color: Colors.white, width: 1),
+         borderRadius: BorderRadius.all(Radius.circular(10))),
+      
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -310,7 +312,7 @@ class _OrderReceivedState extends State<OrderReceived> {
                 getPendingList();
               },
               child: Container(
-                width: MediaQuery.of(context).size.width * .2,
+                width: MediaQuery.of(context).size.width * .23,
                 height: MediaQuery.of(context).size.height * .06,
                 decoration: BoxDecoration(
                     color: pending == true ? HexColor("#3B444B") : Colors.white,
@@ -339,7 +341,7 @@ class _OrderReceivedState extends State<OrderReceived> {
                 getInProcessList();
               },
               child: Container(
-                width: MediaQuery.of(context).size.width * .2,
+                width: MediaQuery.of(context).size.width * .23,
                 height: MediaQuery.of(context).size.height * .06,
                 decoration: BoxDecoration(
                     color:
@@ -358,36 +360,37 @@ class _OrderReceivedState extends State<OrderReceived> {
                 ),
               ),
             ),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  pending = false;
-                  inProcess = false;
-                  rejected = true;
-                  delivered = false;
-                });
-                getRejectedList();
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * .2,
-                height: MediaQuery.of(context).size.height * .06,
-                decoration: BoxDecoration(
-                    color:
-                        rejected == true ? HexColor("#3B444B") : Colors.white,
-                    border: Border.all(color: Colors.blueGrey, width: 1),
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-                child: Center(
-                  child: Text(
-                    "Rejected",
-                    style: TextStyle(
-                        color: rejected == true
-                            ? Colors.white
-                            : HexColor("#3B444B"),
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ),
+            // GestureDetector(
+            //   onTap: () {
+            //     setState(() {
+            //       pending = false;
+            //       inProcess = false;
+            //       rejected = true;
+            //       delivered = false;
+            //     });
+            //     getRejectedList();
+            //   },
+            //   child: Container(
+            //     width: MediaQuery.of(context).size.width * .23,
+            //     height: MediaQuery.of(context).size.height * .06,
+            //     decoration: BoxDecoration(
+            //         color:
+            //             rejected == true ? HexColor("#3B444B") : Colors.white,
+            //         border: Border.all(color: Colors.blueGrey, width: 1),
+            //         borderRadius: BorderRadius.all(Radius.circular(10))),
+            //     child: Center(
+            //       child: Text(
+            //         "Rejected",
+            //         style: TextStyle(
+            //             color: rejected == true
+            //                 ? Colors.white
+            //                 : HexColor("#3B444B"),
+            //             fontWeight: FontWeight.bold),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+         
             GestureDetector(
               onTap: () {
                 setState(() {
@@ -399,7 +402,7 @@ class _OrderReceivedState extends State<OrderReceived> {
                 getDeliveredList();
               },
               child: Container(
-                width: MediaQuery.of(context).size.width * .2,
+                width: MediaQuery.of(context).size.width * .23,
                 height: MediaQuery.of(context).size.height * .06,
                 decoration: BoxDecoration(
                     color:
@@ -502,7 +505,7 @@ class _OrderReceivedState extends State<OrderReceived> {
                   ),
                   orderModel.result[index].paymentMethod == 0
                       ? Text(
-                          "COD",
+                          "Cash",
                           style: style,
                         )
                       : orderModel.result[index].paymentMethod == 1
@@ -602,7 +605,7 @@ class _OrderReceivedState extends State<OrderReceived> {
               ),
               orderModel.result[selectedIndex].paymentMethod==0?
               Text(
-                "Cod",
+                "Cash",
                 style: style.copyWith(color: Colors.black, fontSize: 14),
               ):
               orderModel.result[selectedIndex].paymentMethod==1?
@@ -933,7 +936,7 @@ class _OrderReceivedState extends State<OrderReceived> {
                   Text(
                     "${orderModel.result[selectedIndex].customerName}",
                     style: style2.copyWith(
-                        fontFamily: "antipasto",
+                        //fontFamily: "antipasto",
                         fontSize: 18,
                         color: Colors.black),
                   ),
@@ -946,13 +949,39 @@ class _OrderReceivedState extends State<OrderReceived> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  orderModel.result[selectedIndex].deliveryType==0?
                   Text(
-                    "ABN",
+                    "Seller",
+                    style: style2.copyWith(
+                        fontFamily: "antipasto",
+                        fontSize: 18,
+                        color: Colors.black),
+                  )
+                  :
+                  orderModel.result[selectedIndex].deliveryType==1?
+                  Text(
+                    "Online",
+                    style: style2.copyWith(
+                        fontFamily: "antipasto",
+                        fontSize: 18,
+                        color: Colors.black),
+                  ):
+                  orderModel.result[selectedIndex].deliveryType==1?
+                  Text(
+                    "Self PickUp",
+                    style: style2.copyWith(
+                        fontFamily: "antipasto",
+                        fontSize: 18,
+                        color: Colors.black),
+                  ):
+                  Text(
+                    "Free",
                     style: style2.copyWith(
                         fontFamily: "antipasto",
                         fontSize: 18,
                         color: Colors.black),
                   ),
+                 
                   Text(
                     "Delivery",
                     style: style2.copyWith(fontSize: 12),

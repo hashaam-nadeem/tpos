@@ -528,19 +528,43 @@ class _AddProductState extends State<AddProductSeller> {
           Row(
             children: <Widget>[
               Expanded(
-                flex: 2,
+                flex: 1,
                 child: Column(
                   children: <Widget>[
                     _title("Add Quantity"),
-                    _textFormField("add quantity", qty)
+                    _textFormField("enter quantity", qty)
                   ],
                 ),
               ),
               SizedBox(
                 width: 5,
               ),
+                Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    //_title("Color"),
+                    Container(
+                      height: 48,
+                      color: Colors.white,
+                      // TextFormField(
+                      //   decoration: InputDecoration(
+                      //       suffixIcon: Container(
+                      //     height: 10,
+                      //     width: 10,
+                      //     decoration: BoxDecoration(),
+                      //     child: Icon(Icons.add),
+                      //   )),
+                      // ),
+                   
+                    )
+                  ],
+                ),
+              ),
+            
                Expanded(
-                flex: 2,
+                flex: 1,
                 child: Column(
                   children: <Widget>[
                     _title("Add min order"),
@@ -548,37 +572,15 @@ class _AddProductState extends State<AddProductSeller> {
                   ],
                 ),
               ),
-              SizedBox(
-                width: 5,
-              ),
-              Expanded(
-                flex: 4,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    _title("Color"),
-                    Container(
-                      height: 48,
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                            suffixIcon: Container(
-                          height: 10,
-                          width: 10,
-                          decoration: BoxDecoration(),
-                          child: Icon(Icons.add),
-                        )),
-                      ),
-                    )
-                  ],
-                ),
-              )
+             
+            
             ],
           ),
 
           /////////////////////////////////////////////////////////////////
           ///
            SizedBox(
-                height:5 ,
+                height:15,
               ),
           _title("Discount"),
           Row(
@@ -592,7 +594,7 @@ class _AddProductState extends State<AddProductSeller> {
                       width: 100,
                       child: Column(
                         children: <Widget>[
-                          _title(""),
+                         // _title(""),
                           _textFormField("enter amount", inPercentage)
                         ],
                       ),
@@ -600,7 +602,10 @@ class _AddProductState extends State<AddProductSeller> {
                   ],
                 ),
               ),
-              Row(
+              
+             Padding(
+               padding: EdgeInsets.only(top:30),
+               child:  Row(
                 children: <Widget>[
                   GestureDetector(
                     onTap: () {
@@ -612,7 +617,7 @@ class _AddProductState extends State<AddProductSeller> {
                       });
                     },
                     child: Container(
-                      // margin: EdgeInsets.only(right:10),
+                      // margin: EdgeInsets.only(right:30,top:10),
                       decoration: BoxDecoration(
                           color: Colors.white,
                           border: Border.all(color: Colors.grey),
@@ -635,6 +640,11 @@ class _AddProductState extends State<AddProductSeller> {
                   Text("%   "),
                 ],
               ),
+             
+             ),
+             SizedBox(
+               width: MediaQuery.of(context).size.width*.17,
+             ),
               Expanded(
                 flex: 2,
                 child: Column(
@@ -754,7 +764,7 @@ class _AddProductState extends State<AddProductSeller> {
                     ? TextInputType.number
                     :label == "\$3.5"
                 ? TextInputType.number: 
-                    label == "add quantity"
+                    label == "enter quantity"
                 ? TextInputType.number:
                 label == "min order"
                 ? TextInputType.number:
@@ -767,9 +777,14 @@ class _AddProductState extends State<AddProductSeller> {
             discount.clear();
             salePrice.clear();
           } 
-          
+         
           else if (label == "Actual Price") {
-            if (inPercentage.text.isEmpty) {
+            if(gst.text.isEmpty)
+            {
+              salePrice.text=value;
+            }
+
+            else if (inPercentage.text.isEmpty  ) {
               double g=double.parse(gst.text);
               double p=double.parse(discount.text);
               double afterGstDiscount=(g*p)/100;
@@ -801,10 +816,11 @@ class _AddProductState extends State<AddProductSeller> {
                ;
                print("gst : "+ gst.text);
                 setState(() {
-                    double t = (a*b)/100;
-                    double h=a-t;
-                     double afterGstDiscount=(g*h)/100;
-                     double o=h+afterGstDiscount;
+                  double afterGstDiscount=(g*a)/100;
+                  double h=a+afterGstDiscount;
+                  print(h);
+                    double t = (h*b)/100;
+                     double o=h-t;
                     // double minue=a-t;
                    // double tgst=g+h;
                     //print(tgst);
@@ -820,16 +836,16 @@ class _AddProductState extends State<AddProductSeller> {
                g=0.0:
                g=double.parse(gst.text)
                ;
-
                setState(() {
-                 
-                    double t = a - b;
-                     double afterGstDiscount=(g*t)/100;
-                     double o=t+afterGstDiscount;
+                 double afterGstDiscount=(g*a)/100;
+                 double f=a+afterGstDiscount;
+                    double t = f - b;
+                     
+                    // double o=t+afterGstDiscount;
                     // double tgst=t+o;
                    // print(tgst);
                     
-                    salePrice.text = o.toString(); 
+                    salePrice.text = t.toString(); 
                     //salePrice.text = tgst.toString();
                   });
               }

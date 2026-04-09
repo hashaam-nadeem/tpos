@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:transact/AppBar.dart';
 import 'package:transact/Model/apismodel.dart';
@@ -19,6 +20,47 @@ class _Notifications extends State<Notifications> {
   //////////////////////////font styles/////////////////////////
   NotificationModel notificationModel =NotificationModel();
   final RefreshController _refreshController = RefreshController();
+ProgressDialog pr;
+
+  markAllSeen() async {
+    pr.show();
+    var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+    var response = await http.get(
+      "${API.markAllSeenNotification}",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if (response.statusCode == 200) {
+      if (Json['Data']['WithError'] == true) {
+        pr.dismiss();
+        Fluttertoast.showToast(
+            msg: "${Json['Data']['ShortMessage']}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+            setState(() {
+              notificationModel=NotificationModel();
+            });
+      } else {
+        pr.dismiss();
+        // setState(() {
+        //   notificationModel = NotificationModel.fromJson(Json['Data']);
+        //   //User.userData.marketPlaceModel = marketPlaceModel;
+        // });
+        getNotification();
+      }
+    } else {
+      pr.dismiss();
+      Fluttertoast.showToast(
+          msg: "${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+  }
+
+
     getNotification() async {
     var header = {
       "Authorization": AuthenticationUser.getAuthentication(),
@@ -81,6 +123,19 @@ class _Notifications extends State<Notifications> {
   }
   @override
   Widget build(BuildContext context) {
+    pr = new ProgressDialog(context, type: ProgressDialogType.Normal);
+    pr.style(
+      message: 'Loading...',
+      borderRadius: 10.0,
+      backgroundColor: Colors.white,
+      progressWidget: CircularProgressIndicator(),
+      elevation: 10.0,
+      insetAnimCurve: Curves.easeInOut,
+      progressTextStyle: TextStyle(
+          color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
+      messageTextStyle: TextStyle(
+          color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600),
+    );
     return SafeArea(
         child: Scaffold(
       backgroundColor: HexColor("#F5F7FA"),
@@ -89,6 +144,15 @@ class _Notifications extends State<Notifications> {
         child: CustomeAppBar(
           title: "Notifications",
           type: 'Supplier',
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(right:10),
+                child: deleteButton(),
+              ),
+            ],
+          ),
           //child: _toggleButtons(),
         ),
       ),
@@ -184,6 +248,18 @@ class _Notifications extends State<Notifications> {
       ),
     );
   }
+
+
+Widget deleteButton()
+{
+  return GestureDetector(
+                    onTap: ()
+                    {
+                      markAllSeen();
+                    },
+                    child: Icon(Icons.delete,color: Colors.red,),
+                  );
+}
 
   Widget _listBuilder() {
     

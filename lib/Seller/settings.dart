@@ -16,6 +16,7 @@ import 'package:transact/Model/personalInfomodel.dart';
 import 'package:transact/Seller/deliveryCost.dart';
 import 'package:transact/Seller/pin.dart';
 import 'package:transact/Supplier/headdetail.dart';
+import 'package:transact/changepass.dart';
 import 'package:transact/utils/routes.dart';
 import 'package:transact/utils/shippingaddress.dart';
 import 'package:transact/utils/utils.dart';
@@ -90,6 +91,59 @@ class _SellerSettingsState extends State<SellerSettings> {
     }
   }
      
+       
+       getdeliveryCost() async {
+    pr.show();
+    var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+    print(header);
+    var response = await http.get(
+      "${API.getUserSettings}",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if (response.statusCode == 200) {
+      if (Json['Data']['WithError'] == true) {
+        pr.dismiss();
+        Fluttertoast.showToast(
+            msg: "no Delivery Cost found",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+      } else {
+        pr.dismiss();
+        setState(() {
+          User.userData.deliveryCost = "${Json['Data']['Result']['DeliveryCost']}";
+          User.userData.minOrder = "${Json['Data']['Result']['MinOrder']}";
+        //   User.userData.deliveryCost = Json['Data']['Result']['DeliveryCost'];
+        //  User.userData.sellerDeivery = Json['Data']['Result']['SellerDelivery'];
+        //   User.userData.buyerPickup = Json['Data']['Result']['BuyerPickup'];
+        //    User.userData.onlineDelivery = Json['Data']['Result']['OnlineDelivery'];
+        //    User.userData.isdeliveryFree = Json['Data']['Result']['IsDeliveryFree'];
+        //    User.userData.addressLine=Json['Data']['Result']['Address'];
+           AppRoutes.push(context, DeliveryCost());
+          
+          //AppRoutes.replace(context, BuyerAdress());
+          // cartFount=true;
+          // cartModel=CartModel.fromJson(Json['Data']);
+        });
+        // for(int i=0;i<cartModel.result.length;i++)
+        // {
+        //   setState(() {
+        //     total=total+cartModel.result[i].lineTotal;
+        //   });
+        // }
+      }
+    } else {
+      pr.dismiss();
+      Fluttertoast.showToast(
+          msg: "Status Code: ${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+  }
+
             updateNotification(bool value) async {
     pr.show();
     var header = {
@@ -530,20 +584,20 @@ class _SellerSettingsState extends State<SellerSettings> {
             ],
           ),
           
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                "Refferal Status ",
-                style: style1.copyWith(color: Colors.black),
-              ),
-              Switch(
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: <Widget>[
+          //     Text(
+          //       "Refferal Status ",
+          //       style: style1.copyWith(color: Colors.black),
+          //     ),
+          //     Switch(
 
-                activeColor: Colors.blue,
-                value: User.userData.userResult.referal!=null?true:false,
-              )
-            ],
-          ),
+          //       activeColor: Colors.blue,
+          //       value: User.userData.userResult.referal!=null?true:false,
+          //     )
+          //   ],
+          // ),
           
           _buildTitle("Seller ID & Referral", 1),
          // _buildTitle("Referral Status", 2),
@@ -563,18 +617,53 @@ class _SellerSettingsState extends State<SellerSettings> {
                 ),
                 _buildRow("images/userman.png", "Personal Information"),
                 //_buildRow("images/cards.png", "Bank Account Details"),
-                _buildRow("images/cart4.png", "Shop Details"),
+               // _buildRow("images/cart4.png", "Shop Details"),
               ],
             ),
           ),
           _buildTitle("Set Delivery Cost", 3),
           _buildTitle("Security PIN", 4),
           _buildTitle("Shipping Address", 5),
-          _buildTitle("Head Information",6),
+          _buildTitle("Expense Category",6),
+          changePass(),
         ],
       ),
     );
   }
+
+Widget changePass()
+{
+  return GestureDetector(
+    onTap: ()
+    {
+      AppRoutes.push(context, ChangePassword());
+    },
+    child:   Container(
+    width: MediaQuery.of(context).size.width,
+    height: MediaQuery.of(context).size.height*.07,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      //border: Border.all(color:Colors.green,width:1),
+      borderRadius: BorderRadius.all(Radius.circular(8))
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+             Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text("Change password",
+             style: style1.copyWith(color: Colors.black)
+            ,),
+            Icon(Icons.settings),
+          ],
+        ),
+      
+      ],
+    ),
+  )
+  );
+}
 
   void toggleSwitch(bool value) {
     
@@ -640,6 +729,7 @@ class _SellerSettingsState extends State<SellerSettings> {
 
         setState(() {
           getPersonalInfo=GetPersonalInfo();
+           User.userData.getPersonalInfo=getPersonalInfo;
         });
         AppRoutes.push(context, BuyerShippingAdress());
         //  Fluttertoast.showToast(
@@ -706,7 +796,7 @@ class _SellerSettingsState extends State<SellerSettings> {
               ? AppRoutes.push(context, SellerReferral())
               : id == 4
                   ? AppRoutes.push(context, PIN())
-                  : id == 3 ? AppRoutes.push(context, DeliveryCost()) : null;
+                  : id == 3 ? getdeliveryCost() : null;
                   if(id==5)
                   {
                     AppRoutes.push(context, ShippingAddress());

@@ -20,10 +20,10 @@ import 'package:http/http.dart'as http;
 import 'dart:convert';
 class SupplierHistory extends StatefulWidget {
   @override
-  _SupplierHistory createState() => _SupplierHistory();
+  _SellerHistory createState() => _SellerHistory();
 }
 
-class _SupplierHistory extends State<SupplierHistory> {
+class _SellerHistory extends State<SupplierHistory> {
   ProgressDialog pr;
   bool order=false;
   var style = TextStyle(
@@ -39,7 +39,7 @@ class _SupplierHistory extends State<SupplierHistory> {
     false,
   ];
   bool sales = true, purchase = false;
-  DateTime sDate, eDate;
+  DateTime sDate=DateTime.now(), eDate=DateTime.now();
   DateTime currentDate = DateTime.now();
   HistoryModel historyModel=HistoryModel();
 double total=0.0;
@@ -90,6 +90,86 @@ double total=0.0;
       else
       {
         pr.dismiss();
+          setState(() {
+            historyModel =
+                HistoryModel.fromJson(jsonResponse["Data"]);
+          });
+         for(int i=0;i<historyModel.result.length;i++)
+         {
+           setState(() {
+             total=total+historyModel.result[i].totalBill;
+           });
+         }
+      }
+          
+        }
+
+        // print(_categoriesModel.result.length);
+
+      } else {
+        pr.dismiss();
+         Fluttertoast.showToast(
+          msg: "response status: ${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+        print(
+            " failed to get order history  with status: ${response.statusCode}");
+        json.decode(response.body);
+        }
+    }
+    
+      // Catch Error
+    
+  }
+
+
+  getsale(
+      BuildContext context, String sDate, String eDate) async {
+        
+    if(sDate.isEmpty || eDate.isEmpty)
+    {
+       Fluttertoast.showToast(
+          msg: "Please select date",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+    else
+    {
+     // pr.show();
+      var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+      var response = await http.get(
+          "${API.saleHistory}?startDate=$sDate&endDate=$eDate",
+          headers: header,
+          );
+      // Checking Response Status (if response == 200 )
+      if (response.statusCode == 200) {
+     
+        var jsonResponse = json.decode(response.body);
+        print("Getting order history category response: $jsonResponse");
+        if (jsonResponse['Data']['WithError'] == true) {
+          //pr.dismiss();
+          
+          print(' no data found');
+           Fluttertoast.showToast(
+          msg: "${jsonResponse['Data']['ShortMessage']}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+        } else {
+           setState(() {
+        total=0.0;
+      });
+      if(jsonResponse['Data']['Result']==null)
+      {
+       Fluttertoast.showToast(
+          msg: "no History found",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey); 
+      }
+      else
+      {
+       // pr.dismiss();
           setState(() {
             historyModel =
                 HistoryModel.fromJson(jsonResponse["Data"]);
@@ -201,6 +281,12 @@ double total=0.0;
     
   }
 
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getsale(context, sDate.toString(), eDate.toString());
+  }
   @override
   Widget build(BuildContext context) {
     pr = new ProgressDialog(context, type: ProgressDialogType.Normal);
@@ -219,15 +305,15 @@ double total=0.0;
     return SafeArea(
       child: Scaffold(
         backgroundColor: HexColor("#F5F7FA"),
-        bottomNavigationBar: BottomButton(
-          name: "Print Receipt",
-          image: Image(
-            image: AssetImage("images/print.png"),
-          ),
-          ontap: () {
-            print("working");
-          },
-        ),
+        // bottomNavigationBar: BottomButton(
+        //   name: "Print Receipt",
+        //   image: Image(
+        //     image: AssetImage("images/print.png"),
+        //   ),
+        //   ontap: () {
+        //     print("working");
+        //   },
+        // ),
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(120),
           child: CustomeAppBar(
@@ -557,7 +643,7 @@ Widget _orderDetails() {
               ),
               historyModel.result[selectedIndex].paymentMethod==0?
               Text(
-                "Cod",
+                "Cash",
                 style: style.copyWith(color: Colors.black, fontSize: 14),
               ):
               historyModel.result[selectedIndex].paymentMethod==1?
@@ -687,7 +773,7 @@ Widget _divider() {
                   Text(
                     "${historyModel.result[selectedIndex].customerName}",
                     style: style2.copyWith(
-                        fontFamily: "antipasto",
+                       // fontFamily: "antipasto",
                         fontSize: 18,
                         color: Colors.black),
                   ),
@@ -700,19 +786,46 @@ Widget _divider() {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  historyModel.result[selectedIndex].deliveryType==0?
                   Text(
-                    "ABN",
+                    "Seller",
+                    style: style2.copyWith(
+                        fontFamily: "antipasto",
+                        fontSize: 18,
+                        color: Colors.black),
+                  )
+                  :
+                  historyModel.result[selectedIndex].deliveryType==1?
+                  Text(
+                    "Online",
+                    style: style2.copyWith(
+                        fontFamily: "antipasto",
+                        fontSize: 18,
+                        color: Colors.black),
+                  ):
+                  historyModel.result[selectedIndex].deliveryType==1?
+                  Text(
+                    "Self PickUp",
+                    style: style2.copyWith(
+                        fontFamily: "antipasto",
+                        fontSize: 18,
+                        color: Colors.black),
+                  ):
+                  Text(
+                    "Free",
                     style: style2.copyWith(
                         fontFamily: "antipasto",
                         fontSize: 18,
                         color: Colors.black),
                   ),
+                 
                   Text(
                     "Delivery",
                     style: style2.copyWith(fontSize: 12),
                   ),
                 ],
               )
+           
             ],
           ),
           Container(
@@ -1021,7 +1134,7 @@ class _SalesHistoryState extends State<SalesHistory> {
                   width: 10,
                 ),
                 Text(
-                  "COD",
+                  "Cash",
                   style: style,
                 )
               ]),

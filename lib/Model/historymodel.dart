@@ -26,6 +26,7 @@ class HistoryResult {
   String customerNumber;
   int paymentMethod;
   String date;
+  int deliveryType;
   var totalBill;
   int status;
   List<LineDetail> lineDetail;
@@ -33,6 +34,7 @@ class HistoryResult {
   HistoryResult(
       {this.status,
       this.paymentMethod,
+      this.deliveryType,
       this.orderNumber,
       this.lineDetail,
       this.date,
@@ -54,6 +56,7 @@ class HistoryResult {
       date: json['Date'] ?? "",
       totalBill: json['TotalBill'] ?? 0.0,
       status: json['Status'] ?? 0,
+       deliveryType: json['DeliveryType'] ?? 0,
     );
   }
 }

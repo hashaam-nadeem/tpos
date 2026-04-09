@@ -167,21 +167,22 @@ class _ChangePassword extends State<ChangePassword>
           : id == 3
               ? EdgeInsets.only(top: 20, bottom: 5)
               : EdgeInsets.symmetric(vertical: 2),
-      height: MediaQuery.of(context).size.height * .08,
+      height: MediaQuery.of(context).size.height * .1,
       width: MediaQuery.of(context).size.width*.7,
       child: TextFormField(
         controller: _controller,
         decoration: InputDecoration(
             filled: true,
             fillColor: HexColor("#FFFFFF"),
-            labelText: "$label",
+            //labelText: "$label",
+            hintText: "$label",
             labelStyle: TextStyle(fontSize: 14, color: HexColor("#3B444B")),
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(color: HexColor("#707070"))),
             focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(width: 1, color: HexColor("#707070"))),
+                borderSide: BorderSide(width: 0.5, color: HexColor("#707070"))),
             ),
       ),
     );

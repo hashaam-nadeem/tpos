@@ -71,6 +71,8 @@ class _CustomeAppBarState extends State<CustomeAppBar> {
                       setState(() {
                         User.userData.filter=false;
                       });
+                      print(User.userData.filter );
+                      
                       widget.homepage == true
                           ? Scaffold.of(context).openDrawer()
                           : Navigator.pop(context);

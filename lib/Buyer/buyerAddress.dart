@@ -161,7 +161,7 @@ class _BuyerAdressState extends State<BuyerAdress> {
       if (Json['Data']['WithError'] == true) {
         pr.dismiss();
         Fluttertoast.showToast(
-            msg: "no Delivery Cost found",
+            msg: "${Json['Data']['ShortMessage']}",
             textColor: Colors.white,
             backgroundColor: Colors.blueGrey);
       } else {
@@ -170,7 +170,27 @@ class _BuyerAdressState extends State<BuyerAdress> {
           User.userData.email = "${Json['Data']['Result']['Email']}";
           User.userData.contact = "${Json['Data']['Result']['Phone']}";
           User.userData.deliveryCost = Json['Data']['Result']['DeliveryCost'];
-          AppRoutes.replace(context, CheckOut());
+         User.userData.sellerDeivery = Json['Data']['Result']['SellerDelivery'];
+          User.userData.buyerPickup = Json['Data']['Result']['BuyerPickup'];
+           User.userData.onlineDelivery = Json['Data']['Result']['OnlineDelivery'];
+           User.userData.isdeliveryFree = Json['Data']['Result']['IsDeliveryFree'];
+           User.userData.addressLine=Json['Data']['Result']['Address'];
+           if(User.userData.isdeliveryFree==true)
+           {
+              Fluttertoast.showToast(
+            msg: "Free Delivery",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+            setState(() {
+              User.userData.deliveryCost=0;
+            });
+            AppRoutes.replace(context, CheckOut());
+           }
+           else
+           {
+             AppRoutes.replace(context, CheckOut());
+           }
+          
           //AppRoutes.replace(context, BuyerAdress());
           // cartFount=true;
           // cartModel=CartModel.fromJson(Json['Data']);
@@ -362,7 +382,7 @@ class _BuyerAdressState extends State<BuyerAdress> {
             width: double.infinity,
             child: GestureDetector(
               onTap: () {
-                AppRoutes.push(context, PlacePickerClass());
+                AppRoutes.replace(context, PlacePickerClass());
               },
               child: DashedContainer(
                   dashColor: Colors.blueAccent,

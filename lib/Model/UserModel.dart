@@ -13,7 +13,7 @@ class User {
   factory User() => _singleton;
   User._internal();
   static User get userData => _singleton;
-  bool filter;
+  bool filter=false;
   String deviceId;
   String token;
   UserResult userResult;
@@ -46,4 +46,11 @@ class User {
   bool getSellerProduct=false;
   int rememberPin=0;
   GetPersonalInfo getPersonalInfo;
+  bool onlineDelivery=false,buyerPickup=false,sellerDeivery=false,isdeliveryFree=false;
+  int selectedFilter=5;
+  String minOrder;
+  double selectedLat=0.0,selectedLong=0.0;
+  double radius=0.0;
+  String city;
+  bool location=false;
 }

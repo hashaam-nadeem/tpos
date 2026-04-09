@@ -164,7 +164,7 @@ class _SupplierDrawerState extends State<SupplierDrawer> {
               _buildRow("images/expenses.png", "Expenses"),
               _buildRow("images/reports.png", "Reports"),
               _buildRow("images/history.png", "History"),
-              _buildRow("images/wallet.png", "Wallet"),
+              //_buildRow("images/wallet.png", "Wallet"),
               _buildRow("images/user2.png", "My Account"),
               _buildRow("images/settings.png", "Settings"),
               _buildRow("images/contact-us.png", "Contact Us"),

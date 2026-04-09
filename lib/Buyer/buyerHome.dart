@@ -36,11 +36,106 @@ class _BuyerHomeState extends State<BuyerHome> {
   final RefreshController _refreshController = RefreshController();
   MarketPlaceModel marketPlaceModel = MarketPlaceModel();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
+  bool virtual=false,physical=false;
   var favorite = false;
   bool filter = false;
 
   CategoriesModel categoriesModel = CategoriesModel();
+
+
+  storeFilter() async {
+   // pr.show();
+
+   print("calling store filter");
+    var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+
+    var response = await http.get(
+          User.userData.selectedFilter==0?
+           "${API.marketPlaceStoreType}?GetSellerMarket=true&AllPhysicalStore=true"
+          :
+      "${API.marketPlaceStoreType}?GetSellerMarket=true&AllPhysicalStore=false",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if (response.statusCode == 200) {
+      if (Json['Data']['WithError'] == true) {
+      //  pr.dismiss();
+        setState(() {
+          // dashBoardModel=DashBoardModel();
+          marketPlaceModel = MarketPlaceModel();
+        });
+         Fluttertoast.showToast(
+            msg: "${Json['data']['ShortMessage']}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+      } else {
+        //pr.dismiss();
+        setState(() {
+          marketPlaceModel = MarketPlaceModel.fromJson(Json['Data']);
+          User.userData.marketPlaceModel = marketPlaceModel;
+          User.userData.selectedFilter=5;
+            User.userData.selectedLat=0.0;
+          User.userData.selectedLong=0.0;
+          User.userData.radius=0.0;
+          User.userData.city="";
+        });
+      }
+    } else {
+      //pr.dismiss();
+      Fluttertoast.showToast(
+          msg: "${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+  }
+ locationFilter() async {
+   // pr.show();
+      print("calling Location filter");
+    var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+
+    var response = await http.get(
+         
+      "${API.LatlongFilter}?lat=${User.userData.selectedLat}&lon=${User.userData.selectedLong}&radius=${User.userData.radius}",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if (response.statusCode == 200) {
+      if (Json['Data']['WithError'] == true) {
+      //  pr.dismiss();
+        setState(() {
+          // dashBoardModel=DashBoardModel();
+          marketPlaceModel = MarketPlaceModel();
+        });
+      Fluttertoast.showToast(
+            msg: "${Json['data']['ShortMessage']}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+      } else {
+        //pr.dismiss();
+        setState(() {
+          marketPlaceModel = MarketPlaceModel.fromJson(Json['Data']);
+          User.userData.marketPlaceModel = marketPlaceModel;
+          User.userData.selectedLat=0.0;
+          User.userData.selectedLong=0.0;
+          User.userData.radius=0.0;
+          User.userData.city="";
+          User.userData.location=false;
+        });
+      }
+    } else {
+      //pr.dismiss();
+      Fluttertoast.showToast(
+          msg: "${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+  }
 
 
 
@@ -152,7 +247,6 @@ getCategoryProduct(int id) async {
     }
   }
 
-
   getSellerProduct() async {
     var header = {
       "Authorization": AuthenticationUser.getAuthentication(),
@@ -169,6 +263,7 @@ getCategoryProduct(int id) async {
         setState(() {
           // dashBoardModel=DashBoardModel();
           marketPlaceModel = MarketPlaceModel();
+           User.userData.selectedFilter=5;
         });
         Fluttertoast.showToast(
             msg: "no product found",
@@ -178,6 +273,7 @@ getCategoryProduct(int id) async {
         setState(() {
           marketPlaceModel = MarketPlaceModel.fromJson(Json['Data']);
           User.userData.marketPlaceModel = marketPlaceModel;
+          User.userData.selectedFilter=5;
         });
       }
     } else {
@@ -192,7 +288,11 @@ getCategoryProduct(int id) async {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getSellerProduct();
+    User.userData.selectedFilter==5?
+    User.userData.location==true?
+    locationFilter():
+     getSellerProduct():
+    storeFilter();
     getCategory();
   }
 
@@ -573,6 +673,7 @@ getCategoryProduct(int id) async {
       onTap: () {
         setState(() {
           User.userData.index = index;
+          User.userData.marketPlaceModel=marketPlaceModel;
         });
         print(User.userData.index = index);
         AppRoutes.push(context, ItemDetailsBuyer());
@@ -678,6 +779,22 @@ getCategoryProduct(int id) async {
                       ],
                     ),
                   ),
+                   Row(
+                    children: <Widget>[
+                      marketPlaceModel.result[index].gst.toString().isEmpty?
+                      Text("")
+                      :
+                       Text(
+                          "including ${marketPlaceModel.result[index].gst}% gst",
+                          style: TextStyle(
+                              color: HexColor("#3B444B"),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'CaviarDreams'),
+                        ),
+                    ],
+                  ),
+                 
                   Expanded(
                     child: Align(
                       alignment: Alignment.centerRight,
@@ -886,4 +1003,135 @@ getCategoryProduct(int id) async {
         );
   }
 
+
+void _showDialog() {
+    showDialog(
+        context: context,
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          contentPadding: EdgeInsets.only(top: 10.0),
+          content: 
+          Container(
+            padding: EdgeInsets.only(top: 20, left: 15, right: 15),
+            height: MediaQuery.of(context).size.height * .65,
+            decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey,
+                    blurRadius: 5,
+                  )
+                ],
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(35),
+                    topLeft: Radius.circular(35))),
+            child: Column(
+              children: <Widget>[
+                Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              CircleAvatar(
+                radius: 12,
+                backgroundColor: HexColor("#FF77E5"),
+              ),
+              Row(
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        physical = true;
+                        virtual = false;
+                      });
+                    },
+                    child: Container(
+                      // margin: EdgeInsets.only(top:10),
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          border: Border.all(color: Colors.grey, width: 1.5)),
+                      child: Center(
+                        child: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: physical == true
+                                  ? Colors.black
+                                  : Colors.white,
+                            )),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                    //height: 10,
+                  ),
+                  Text("Physical Store", style: TextStyle(color: Colors.black)),
+                ],
+              ),
+              
+            ],
+          ),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(top:20),
+                child: CircleAvatar(
+                radius: 12,
+                backgroundColor: HexColor("#C5DC1B"),
+              ),
+              ),
+             Padding(
+               padding: EdgeInsets.only(top:20),
+               child:  Row(
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        physical = false;
+                        virtual = true;
+                      });
+                    },
+                    child: Container(
+                     // margin: EdgeInsets.only(top: 20),
+                      // margin: EdgeInsets.only(top:10),
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          border: Border.all(color: Colors.grey, width: 1.5)),
+                      child: Center(
+                        child: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color:
+                                  virtual == true ? Colors.black : Colors.white,
+                            )),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                    //height: 10,
+                  ),
+                  Text("Virtual Store", style: TextStyle(color: Colors.black)),
+                ],
+              ),
+             
+             ), 
+            ],
+          ),
+                              ],
+            ),
+          )),
+    );
+  }
 }

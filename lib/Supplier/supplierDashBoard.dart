@@ -251,7 +251,7 @@ enablePullDown: true,
               )
               ),
           staggeredTileBuilder: (int index) =>
-              new StaggeredTile.count(2, index.isEven ? 3.2 : 2.9),
+              new StaggeredTile.count(2, index.isEven ? 3.4 : 3.2),
           mainAxisSpacing: 7.0,
           crossAxisSpacing: 7.0,
         )));
@@ -377,6 +377,22 @@ enablePullDown: true,
                       ],
                     ),
                   ),
+                   Row(
+                    children: <Widget>[
+                      dashBoardModel.result[index].gst.toString().isEmpty?
+                      Text("")
+                      :
+                       Text(
+                          "including ${dashBoardModel.result[index].gst}% gst",
+                          style: TextStyle(
+                              color: HexColor("#3B444B"),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'CaviarDreams'),
+                        ),
+                    ],
+                  ),
+                 
                   Container(
                     alignment: Alignment.centerLeft,
                     child: Text(

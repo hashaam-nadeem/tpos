@@ -66,7 +66,6 @@ ProgressDialog pr;
             msg: "${Json['Data']['ShortMessage']}",
             textColor: Colors.white,
             backgroundColor: Colors.blueGrey);
-            
        }
     }
     else
@@ -78,6 +77,52 @@ ProgressDialog pr;
             backgroundColor: Colors.blueGrey);
     }
   }
+
+  cartEmpty() async
+  {
+    // setState(() {
+    //   total=0.0;
+    // });
+    pr.show();
+     var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+    var response = await http.get(
+      "${API.CartEmpty}",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if(response.statusCode==200)
+    {
+       if (Json['Data']['WithError'] == true) 
+       {
+         pr.dismiss();
+           Fluttertoast.showToast(
+            msg: "${Json['Data']['ShortMessage']}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+       }
+       else
+       {
+         pr.dismiss();
+         getCartline();
+          Fluttertoast.showToast(
+            msg: "${Json['Data']['ShortMessage']}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+       }
+    }
+    else
+    {
+      pr.dismiss();
+      Fluttertoast.showToast(
+            msg: "Status Code: ${response.statusCode}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+    }
+  }
+  
   getCartline() async
   {
     setState(() {
@@ -129,6 +174,7 @@ ProgressDialog pr;
             backgroundColor: Colors.blueGrey);
     }
   }
+  
   @override
   void initState() {
     // TODO: implement initState
@@ -162,6 +208,15 @@ ProgressDialog pr;
             child: CustomeAppBar(
               title: "My Cart",
               homepage: false,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                 Padding(
+                   padding: EdgeInsets.only(right:10,bottom:5),
+                   child:  deleteButton(),
+                 ),
+                ],
+              ),
             ),
           )),
       body: SingleChildScrollView(
@@ -189,7 +244,7 @@ ProgressDialog pr;
           SizedBox(
             height: 10,
           ),
-          _voucher()
+         // _voucher()
         ],
       ))),
     ));
@@ -274,11 +329,13 @@ ProgressDialog pr;
             children: <Widget>[
               Container(
                 alignment: Alignment.center,
-                margin: EdgeInsets.only(left: 3),
+                width: MediaQuery.of(context).size.width*.23,
+                height: MediaQuery.of(context).size.height*.08,
+                margin: EdgeInsets.only(left: 5,right:5),
                 child: 
                 cartModel.result[index].imagePath!=null?
                 Image.network("${API.API_URL}${cartModel.result[index].imagePath}",
-                scale: 10,
+               // scale: 10,
                 )
                 :
                 Image.asset(
@@ -411,10 +468,12 @@ ProgressDialog pr;
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
+                
                 Expanded(
                   flex: 2,
                   child: _textField("", "Enter Voucher Code", 3),
                 ),
+
                 Expanded(
                   flex: 1,
                   child: Container(
@@ -440,7 +499,16 @@ ProgressDialog pr;
   }
 
   
-
+Widget deleteButton()
+{
+  return GestureDetector(
+                    onTap: ()
+                    {
+                      cartEmpty();
+                    },
+                    child: Icon(Icons.delete,color: Colors.red,),
+                  );
+}
   Widget _counter() {
     return Container(
       height: MediaQuery.of(context).size.height / 26,

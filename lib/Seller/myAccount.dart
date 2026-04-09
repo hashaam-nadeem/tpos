@@ -181,7 +181,7 @@ OrderModel orderModel=OrderModel();
         children: <Widget>[_myOrders(), 
         
        // _eWallet(),
-       changePass(),
+       //changePass(),
         listOrder(),
         
         
@@ -378,7 +378,7 @@ Widget listOrders(int index)
             children: <Widget>[
               _orderType("images/pay.png", "To Pay"),
              // _orderType("images/return.png", "My Return"),
-              _orderType("images/cargo.png", "My Cancelation"),
+              _orderType("images/cargo.png", "My Cancellation"),
             ],
           )
         ],
@@ -397,7 +397,7 @@ Widget listOrders(int index)
               {
                 getToPay();
               }
-              else if(text=="My Cancelation")
+              else if(text=="My Cancellation")
               {
                 myCancellation();
               }

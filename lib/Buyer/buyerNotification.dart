@@ -1,6 +1,8 @@
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:transact/AppBar.dart';
 import 'package:transact/Model/apismodel.dart';
@@ -9,15 +11,56 @@ import 'package:transact/Model/notificationmodel.dart';
 import 'package:transact/utils/utils.dart';
 import 'package:http/http.dart'as http;
 import 'dart:convert';
-class BuyerNotifications extends StatefulWidget {
+class SellerNotifications extends StatefulWidget {
   @override
-  _SellerNotificationsState createState() => _SellerNotificationsState();
+  _Notifications createState() => _Notifications();
 }
 
-class _SellerNotificationsState extends State<BuyerNotifications> {
+class _Notifications extends State<SellerNotifications> {
   //////////////////////////font styles/////////////////////////
   NotificationModel notificationModel =NotificationModel();
   final RefreshController _refreshController = RefreshController();
+ProgressDialog pr;
+
+  markAllSeen() async {
+    pr.show();
+    var header = {
+      "Authorization": AuthenticationUser.getAuthentication(),
+    };
+    var response = await http.get(
+      "${API.markAllSeenNotification}",
+      headers: header,
+    );
+    var Json = json.decode(response.body);
+    print(json.decode(response.body));
+    if (response.statusCode == 200) {
+      if (Json['Data']['WithError'] == true) {
+        pr.dismiss();
+        Fluttertoast.showToast(
+            msg: "${Json['Data']['ShortMessage']}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+            setState(() {
+              notificationModel=NotificationModel();
+            });
+      } else {
+        pr.dismiss();
+        // setState(() {
+        //   notificationModel = NotificationModel.fromJson(Json['Data']);
+        //   //User.userData.marketPlaceModel = marketPlaceModel;
+        // });
+        getNotification();
+      }
+    } else {
+      pr.dismiss();
+      Fluttertoast.showToast(
+          msg: "${response.statusCode}",
+          textColor: Colors.white,
+          backgroundColor: Colors.blueGrey);
+    }
+  }
+
+
     getNotification() async {
     var header = {
       "Authorization": AuthenticationUser.getAuthentication(),
@@ -80,14 +123,36 @@ class _SellerNotificationsState extends State<BuyerNotifications> {
   }
   @override
   Widget build(BuildContext context) {
+    pr = new ProgressDialog(context, type: ProgressDialogType.Normal);
+    pr.style(
+      message: 'Loading...',
+      borderRadius: 10.0,
+      backgroundColor: Colors.white,
+      progressWidget: CircularProgressIndicator(),
+      elevation: 10.0,
+      insetAnimCurve: Curves.easeInOut,
+      progressTextStyle: TextStyle(
+          color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
+      messageTextStyle: TextStyle(
+          color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600),
+    );
     return SafeArea(
         child: Scaffold(
       backgroundColor: HexColor("#F5F7FA"),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(120),
         child: CustomeAppBar(
-          title: "Notification",
+          title: "Notifications",
           type: 'Supplier',
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(right:10),
+                child: deleteButton(),
+              ),
+            ],
+          ),
           //child: _toggleButtons(),
         ),
       ),
@@ -184,7 +249,20 @@ class _SellerNotificationsState extends State<BuyerNotifications> {
     );
   }
 
+
+Widget deleteButton()
+{
+  return GestureDetector(
+                    onTap: ()
+                    {
+                      markAllSeen();
+                    },
+                    child: Icon(Icons.delete,color: Colors.red,),
+                  );
+}
+
   Widget _listBuilder() {
+    
     return SmartRefresher(
       controller: _refreshController,
       enablePullDown: true,
@@ -194,7 +272,7 @@ class _SellerNotificationsState extends State<BuyerNotifications> {
                 _refreshController.refreshCompleted();
               },
       child: ListView.builder(
-       // reverse:true,
+        //reverse:true,
       itemCount: notificationModel.result!=null?notificationModel.result.length:0,
       itemBuilder: (context, index) {
         return _listData(index);
@@ -203,17 +281,19 @@ class _SellerNotificationsState extends State<BuyerNotifications> {
     );
 }
 }
+
 // import 'package:flutter/material.dart';
 // import 'package:intl/intl.dart';
 // import 'package:transact/AppBar.dart';
 // import 'package:transact/utils/utils.dart';
-
-// class BuyerNotifications extends StatefulWidget {
+// import 'package:http/http.dart'as http;
+// import 'dart:convert';
+// class Notifications extends StatefulWidget {
 //   @override
-//   _BuyerNotificationsState createState() => _BuyerNotificationsState();
+//   _NotificationsState createState() => _NotificationsState();
 // }
 
-// class _BuyerNotificationsState extends State<BuyerNotifications> {
+// class _NotificationsState extends State<Notifications> {
 //   //////////////////////////font styles/////////////////////////
 //   var style1 = TextStyle(
 //       fontFamily: "CaviarDreams",
@@ -234,20 +314,78 @@ class _SellerNotificationsState extends State<BuyerNotifications> {
 
 //   var formattedDate = DateFormat("dd-mm-yyyy").format(DateTime.now());
 
-//   List<bool> _selection = [true, false];
+//   List<bool> _selection = [true,false];
 //   @override
 //   Widget build(BuildContext context) {
 //     return SafeArea(
 //         child: Scaffold(
 //       backgroundColor: HexColor("#F5F7FA"),
 //       appBar: PreferredSize(
-//         preferredSize: Size.fromHeight(70),
+//         preferredSize: Size.fromHeight(120),
 //         child: CustomeAppBar(
 //           title: "Notification",
+//           type: 'Supplier',
+//           child: _toggleButtons(),
 //         ),
 //       ),
 //       body: _listBuilder(),
 //     ));
+//   }
+
+//   Widget _toggleButtons() {
+//     return Container(
+//       alignment: Alignment.center,
+//       height: 40,
+//       width: MediaQuery.of(context).size.width * .7,
+//       child: ToggleButtons(
+//         fillColor: Colors.white,
+//         borderColor: Colors.white,
+//         selectedBorderColor: Colors.white,
+//         borderWidth: 1.5,
+//         borderRadius: BorderRadius.circular(3),
+//         isSelected: _selection,
+//         children: <Widget>[
+//           Container(
+//               margin: EdgeInsets.symmetric(horizontal: 17),
+//               child: Text(
+//                 "Notification",
+//                 style: TextStyle(
+//                   fontSize: 14,
+//                   color: _selection.elementAt(0) == true
+//                       ? Colors.black
+//                       : Colors.white,
+//                 ),
+//                 textAlign: TextAlign.center,
+//               )),
+//           Container(
+//               margin: EdgeInsets.symmetric(horizontal: 17), 
+//               child: Text(
+//                 " Reminder ",
+//                 style: TextStyle(
+//                   fontSize: 14,
+//                   color: _selection.elementAt(1) == true
+//                       ? Colors.black
+//                       : Colors.white,
+//                 ),
+//                 textAlign: TextAlign.center,
+//               )),
+//         ],
+//         onPressed: (int index) {
+//           setState(() {
+//             _selection[index] = !_selection[index];
+//           });
+//           for (int buttonIndex = 0;
+//               buttonIndex < _selection.length;
+//               buttonIndex++) {
+//             if (buttonIndex == index) {
+//               _selection[buttonIndex] = true;
+//             } else {
+//               _selection[buttonIndex] = false;
+//             }
+//           }
+//         },
+//       ),
+//     );
 //   }
 
 //   Widget _listData() {
@@ -262,7 +400,7 @@ class _SellerNotificationsState extends State<BuyerNotifications> {
 //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //             children: <Widget>[
 //               Text(
-//                 "Purchase Confirmation",
+//                 _selection[0] ? "New Order" : "Reminder",
 //                 style: style1,
 //               ),
 //               Text(

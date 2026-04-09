@@ -10,6 +10,7 @@ import 'package:transact/Model/UserModel.dart';
 import 'package:transact/Model/apismodel.dart';
 import 'package:transact/Model/cartmodel.dart';
 import 'package:transact/Model/getauthentication.dart';
+import 'package:transact/Seller/sellerHome.dart';
 import 'dart:convert';
 
 import 'package:transact/utils/bottomButton.dart';
@@ -58,8 +59,9 @@ ProgressDialog pr;
           User.userData.email = "${Json['Data']['Result']['Email']}";
           User.userData.contact = "${Json['Data']['Result']['Phone']}";
           User.userData.deliveryCost = Json['Data']['Result']['DeliveryCost'];
+          confirmrOrder();
          // User.userData.totalCart=User.userData.totalCart=
-          AppRoutes.push(context, CashierCheckOutMethod());
+          //AppRoutes.push(context, CashierCheckOutMethod());
           //AppRoutes.replace(context, CheckOut());
           //AppRoutes.replace(context, BuyerAdress());
           // cartFount=true;
@@ -79,6 +81,50 @@ ProgressDialog pr;
           textColor: Colors.white,
           backgroundColor: Colors.blueGrey);
     }
+  }
+
+  confirmrOrder() async {
+    pr.show();
+      var header = {
+        "Authorization": AuthenticationUser.getAuthentication(),
+      };
+      var body = {
+        "paymentType": "0",
+        "pin": "${User.userData.rememberPin}",
+        // "DeliveryAddressId": "${User.userData.addressModel.result[User.userData.index].id}",
+        "DeliveryCost": "0.0",
+      };
+      print(header);
+      // print(t);
+      var response =
+          await http.post("${API.cashierConfirmCart}", headers: header, body: body);
+      var Json = json.decode(response.body);
+      print(Json);
+      if (response.statusCode == 200) {
+        if (Json['Data']['WithError'] == false) {
+          pr.dismiss();
+          Fluttertoast.showToast(
+              msg: "${Json['Data']['ShortMessage']}",
+              textColor: Colors.white,
+              backgroundColor: Colors.blueGrey);
+          Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => SellerHome()));
+        } else {
+          pr.dismiss();
+          Fluttertoast.showToast(
+              msg: "${Json['Data']['ShortMessage']}",
+              textColor: Colors.white,
+              backgroundColor: Colors.blueGrey);
+        }
+      } else {
+        pr.dismiss();
+        Fluttertoast.showToast(
+            msg: "response status: ${response.statusCode}",
+            textColor: Colors.white,
+            backgroundColor: Colors.blueGrey);
+      }
   }
 
   deleteCart(int id) async
@@ -238,7 +284,7 @@ ProgressDialog pr;
           SizedBox(
             height: 10,
           ),
-          _voucher()
+          //_voucher()
         ],
       ))),
     ));
@@ -295,7 +341,7 @@ ProgressDialog pr;
                     setState(() {
                       User.userData.totalCart=total;
                     });
-                    getdeliveryCost();
+                    confirmrOrder();
                   }
                    
                   //AppRoutes.push(context, BuyerPaymentSelection());
@@ -322,11 +368,13 @@ ProgressDialog pr;
             children: <Widget>[
               Container(
                 alignment: Alignment.center,
-                margin: EdgeInsets.only(left: 3),
+                 width: MediaQuery.of(context).size.width*.23,
+                height: MediaQuery.of(context).size.height*.08,
+                margin: EdgeInsets.only(left: 5,right:5),
                 child: 
                 cartModel.result[index].imagePath!=null?
                 Image.network("${API.API_URL}${cartModel.result[index].imagePath}",
-                scale: 10,
+                //scale: 10,
                 )
                 :
                 Image.asset(

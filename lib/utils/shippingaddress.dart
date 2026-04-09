@@ -366,7 +366,7 @@ class _ShippingAddress extends State<ShippingAddress> {
               onTap: () {
                 // location();
                 // search();
-                AppRoutes.push(context, SettingLocation());
+                AppRoutes.replace(context, SettingLocation());
               },
               child: DashedContainer(
                   dashColor: Colors.blueAccent,
@@ -488,16 +488,7 @@ class _ShippingAddress extends State<ShippingAddress> {
                         style: headingFont,
                       ),
                     ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {},
-                        child: Container(
-                            child: Text(
-                          "EDIT",
-                          style: headingFont.copyWith(fontSize: 17),
-                        )),
-                      ),
-                    )
+                 
                   ],
                 ),
               ),

@@ -24,6 +24,9 @@ class _CheckOutState extends State<CheckOut> {
   var editAdress = false;
   int deliverycostCheck = 5;
   int selected = 5;
+  TextEditingController email=TextEditingController();
+    TextEditingController contact=TextEditingController();
+      TextEditingController voucher=TextEditingController();
   double shippingFee = 15;
   double grandTotal = 0.0;
   getdeliveryCost() async {
@@ -86,7 +89,9 @@ class _CheckOutState extends State<CheckOut> {
         ),
         body: SingleChildScrollView(
           child: Column(
-            children: <Widget>[_buyerInfo(), _deliveryOptions(), _voucher()],
+            children: <Widget>[_buyerInfo(), _deliveryOptions(), 
+           // _voucher()
+            ],
           ),
         ),
       ),
@@ -206,10 +211,24 @@ class _CheckOutState extends State<CheckOut> {
                           textColor: Colors.white,
                           backgroundColor: Colors.blueGrey);
                     } else {
-                      setState(() {
+                      if(email.text.isNotEmpty || contact.text.isNotEmpty)
+                      {
+                        setState(() {
+                        User.userData.totalCart=grandTotal;
+                        User.userData.email=email.text.trim();
+                        User.userData.contact=contact.text.trim();
+                      });
+                      print(User.userData.contact);
+                      AppRoutes.push(context, BuyerPaymentSelection());
+                      }
+                      else
+                      {
+                        setState(() {
                         User.userData.totalCart=grandTotal;
                       });
                       AppRoutes.push(context, BuyerPaymentSelection());
+                      }
+                      
                     }
                   }),
             ),
@@ -295,8 +314,8 @@ class _CheckOutState extends State<CheckOut> {
               ],
             ),
           ),
-          _textField("images/email.png", "${User.userData.email}", 1),
-          _textField("images/phone.png", "${User.userData.contact}", 2)
+          _textField("images/email.png", "${User.userData.email}", 1,email),
+          _textField("images/phone.png", "${User.userData.contact}", 2,contact)
         ],
       ),
     );
@@ -315,15 +334,22 @@ class _CheckOutState extends State<CheckOut> {
           Container(
               margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
               child: Text("Delivery Options", style: headingFont)),
-          Container(
-              height: MediaQuery.of(context).size.height * .12,
-              child: ListView.builder(
-                itemCount: 3,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context, index) {
-                  return _optionCard(index);
-                },
-              ))
+         Row(
+           children: <Widget>[
+             Text("   "),
+            User.userData.isdeliveryFree==true?
+             _optionCard(3):
+             _optionCard(0),
+              Text(""),
+              User.userData.onlineDelivery==true?
+              _optionCard(1)
+              :Text(""),
+              User.userData.buyerPickup==true?
+              _optionCard(2)
+              :Text(""),
+           ],
+         ),
+         
         ],
       ),
     );
@@ -379,7 +405,9 @@ class _CheckOutState extends State<CheckOut> {
       },
       child: Container(
         //margin: EdgeInsets.symmetric(horizontal: 3, vertical: 5),
-        padding: EdgeInsets.all(10),
+        //padding: EdgeInsets.all(10),
+        width: MediaQuery.of(context).size.width*.32,
+        height: MediaQuery.of(context).size.height*.14,
         decoration: BoxDecoration(
           border: Border.all(
             color: selected == id ? HexColor("#FF6D2B") : HexColor("#79C5D6"),
@@ -388,18 +416,22 @@ class _CheckOutState extends State<CheckOut> {
           color: id == 1 ? Colors.grey[200] : HexColor("#FAFAFA"),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Text(
               id == 0
                   ? "Seller Delivery"
-                  : id == 1 ? "Online Delivery" : "Self Pickup",
+                  : id == 1 ? "Online Delivery" : 
+                  id==3?
+                  "free Delivery"
+                  :
+                  "Self Pickup",
               style: headingFont.copyWith(color: Colors.black),
             ),
             id == 2
                 ? Container(
                     child: Text(
-                      "You can pick your\n order any time",
+                      "${User.userData.addressLine}",
                       style: headingFont.copyWith(
                           color: Colors.black, fontSize: 12),
                     ),
@@ -445,7 +477,9 @@ class _CheckOutState extends State<CheckOut> {
                   )
                 : Container(
                     child:
-                        Text(id == 1 ? "Unavailable" : "Get within 4 to 6 days",
+                        Text(id == 1 ? "Unavailable" : id==3?
+                        ""
+                        :"    Get within 4 to 6 days",
                             style: headingFont.copyWith(
                               color: Colors.black,
                               fontSize: 12,
@@ -457,12 +491,13 @@ class _CheckOutState extends State<CheckOut> {
     );
   }
 
-  Widget _textField(String image, String label, id) {
+  Widget _textField(String image, String label, id,_controller) {
     return Container(
       margin: EdgeInsets.only(right: 20, top: 5),
       height: 45,
       child: TextFormField(
-        enabled: editAdress,
+        controller: _controller,
+        //enabled: editAdress,
         decoration: InputDecoration(
           isDense: true,
           icon: image == ""
@@ -512,7 +547,7 @@ class _CheckOutState extends State<CheckOut> {
               children: <Widget>[
                 Expanded(
                   flex: 2,
-                  child: _textField("", "Enter Voucher Code", 3),
+                  child: _textField("", "Enter Voucher Code", 3,voucher),
                 ),
                 Expanded(
                   flex: 1,

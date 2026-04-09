@@ -12,6 +12,7 @@ import 'package:transact/Model/apismodel.dart';
 import 'package:transact/Model/getauthentication.dart';
 import 'package:transact/Model/personalInfomodel.dart';
 import 'package:transact/Seller/settings.dart';
+import 'package:transact/changepass.dart';
 import 'package:transact/utils/routes.dart';
 import 'package:transact/utils/shippingaddress.dart';
 import 'package:transact/utils/utils.dart';
@@ -61,6 +62,7 @@ class _BuyerSettingsState extends State<BuyerSettings> {
 
         setState(() {
           getPersonalInfo=GetPersonalInfo();
+          User.userData.getPersonalInfo=getPersonalInfo;
         });
         AppRoutes.push(context, BuyerShippingAdress());
         //  Fluttertoast.showToast(
@@ -448,8 +450,9 @@ class _BuyerSettingsState extends State<BuyerSettings> {
                     style: style1.copyWith(color: Colors.black),
                   ),
                 ),
+                changePass(),
                 _buildRow("images/adress.png", "Shipping Adress", 3),
-                _buildRow("images/currency.png", "Currency", 4),
+               // _buildRow("images/currency.png", "Currency", 4),
               ],
             ),
           ),
@@ -506,6 +509,39 @@ class _BuyerSettingsState extends State<BuyerSettings> {
       ),
     );
   }
+Widget changePass()
+{
+  return GestureDetector(
+    onTap: ()
+    {
+      AppRoutes.push(context, ChangePassword());
+    },
+    child:   Container(
+    width: MediaQuery.of(context).size.width,
+    height: MediaQuery.of(context).size.height*.07,
+    decoration: BoxDecoration(
+     // color: Colors.white,
+      //border: Border.all(color:Colors.green,width:1),
+      borderRadius: BorderRadius.all(Radius.circular(8))
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+             Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text("Change password",
+             style: style1.copyWith(color: Colors.black)
+            ,),
+            Icon(Icons.settings),
+          ],
+        ),
+      
+      ],
+    ),
+  )
+  );
+}
 
     void toggleSwitch(bool value) {
     

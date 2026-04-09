@@ -238,7 +238,7 @@ class _SellerHomeState extends State<SellerHome> {
                     child: _itemCardSupplier(index),
                   )),
               staggeredTileBuilder: (int index) =>
-                  new StaggeredTile.count(2, index.isEven ? 3.2 : 3),
+                  new StaggeredTile.count(2, index.isEven ? 3.4 : 3.2),
               mainAxisSpacing: 7.0,
               crossAxisSpacing: 7.0,
             )));
@@ -364,6 +364,23 @@ class _SellerHomeState extends State<SellerHome> {
                       ],
                     ),
                   ),
+                   Row(
+                  
+                    children: <Widget>[
+                      marketPlaceModel.result[index].gst.toString().isEmpty?
+                      Text("")
+                      :
+                       Text(
+                          "including ${marketPlaceModel.result[index].gst}% gst",
+                          style: TextStyle(
+                              color: HexColor("#3B444B"),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'CaviarDreams'),
+                        ),
+                    ],
+                  ),
+                 
                   Container(
                     alignment: Alignment.centerLeft,
                     child: Text(

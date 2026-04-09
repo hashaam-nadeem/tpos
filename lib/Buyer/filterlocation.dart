@@ -14,12 +14,12 @@ import 'package:transact/Model/getauthentication.dart';
 import 'package:transact/utils/routes.dart';
 
 
-class StoreDetailAddress extends StatefulWidget {
+class FilterLocation extends StatefulWidget {
   @override
   _PlacePickerClassState createState() => _PlacePickerClassState();
 }
 
-class _PlacePickerClassState extends State<StoreDetailAddress> {
+class _PlacePickerClassState extends State<FilterLocation> {
   Completer<GoogleMapController> _controller = Completer();
   static const LatLng _center = const LatLng(31.4544247, 74.2766182);
   List<Map<dynamic, dynamic>> list = [];
@@ -76,6 +76,7 @@ class _PlacePickerClassState extends State<StoreDetailAddress> {
               textColor: Colors.white,
               backgroundColor: Colors.blueGrey);
               AppRoutes.replace(context, BuyerAdress());
+              
               // setState(() {
 
               //   // addnew=false;
@@ -147,10 +148,7 @@ class _PlacePickerClassState extends State<StoreDetailAddress> {
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                       onPressed: () {
-
-                    Navigator.of(context).pop();
-                        //addNewAddress();
-                      },
+                        Navigator.of(context).pop();                      },
                     ),
                   )
                 ],
@@ -170,15 +168,12 @@ class _PlacePickerClassState extends State<StoreDetailAddress> {
             target: LatLng(31.476954700000004, 74.28921989999999), zoom: 14.0),
         onTap: (latLong) {
           setMarker(latLong);
-         
         },
         mapType: MapType.normal,
         onMapCreated: _onMapCreated,
         onCameraMove: _onCameraMove,
         markers: marker);
   }
-  
-
 
   Future setMarker(LatLng latLng) async {
     final coordinates = new Coordinates(latLng.latitude, latLng.longitude);
@@ -186,21 +181,21 @@ class _PlacePickerClassState extends State<StoreDetailAddress> {
         await Geocoder.local.findAddressesFromCoordinates(coordinates);
     print("${addresses.first.featureName} : ${addresses.first.addressLine}");
     setState(() {
-      User.userData.lat=latLng.latitude;
-      User.userData.long=latLng.longitude;
-      address = addresses[0].toMap();
-      adress=addresses.first.addressLine;
-      User.userData.addressLine=addresses.first.addressLine;
-      country=addresses.first.countryName;
-      city=addresses.first.locality;
-      state=addresses.first.adminArea;
-      print(address);
-      print(city);
-      print(state);
-      print(country);
-      marker.clear();
-      lat = latLng.latitude;
-      long = latLng.longitude;
+      User.userData.selectedLat=latLng.latitude;
+      User.userData.selectedLong=latLng.longitude;
+       address = addresses[0].toMap();
+      // adress=addresses.first.addressLine;
+      // User.userData.addressLine=addresses.first.addressLine;
+      // country=addresses.first.countryName;
+       User.userData.city=addresses.first.locality;
+      // state=addresses.first.adminArea;
+      // print(address);
+      // print(city);
+      // print(state);
+      // print(country);
+      // marker.clear();
+      // lat = latLng.latitude;
+      // long = latLng.longitude;
 
       marker.add(
         Marker(

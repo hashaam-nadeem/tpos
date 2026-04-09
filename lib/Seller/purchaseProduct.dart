@@ -196,7 +196,7 @@ class _PurchaseProductState extends State<PurchaseProduct> {
           child: CustomeAppBar(
             homepage: false,
             title: "Marketplace",
-             bottomIcon2: "images/cart4.png",
+              bottomIcon2: "images/cart4.png",
             bottomIcon2OnTap: () {
               AppRoutes.push(context, BuyerCart());
             },
@@ -812,6 +812,22 @@ class _PurchaseProductState extends State<PurchaseProduct> {
                       ],
                     ),
                   ),
+                    Row(
+                    children: <Widget>[
+                      marketPlaceModel.result[index].gst.toString().isEmpty?
+                      Text("")
+                      :
+                       Text(
+                          "including ${marketPlaceModel.result[index].gst}% gst",
+                          style: TextStyle(
+                              color: HexColor("#3B444B"),
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'CaviarDreams'),
+                        ),
+                    ],
+                  ),
+                 
                   Expanded(
                     child: Align(
                       alignment: Alignment.centerRight,
@@ -952,6 +968,7 @@ class _PurchaseProductState extends State<PurchaseProduct> {
       ),
     );
   }
+  
    Widget showRating() {
     return Container(
       child: Icon(

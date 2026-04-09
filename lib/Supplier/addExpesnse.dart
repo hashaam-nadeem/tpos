@@ -82,41 +82,28 @@ class _AddExpenseState extends State<AddExpense> {
     }
   }
 
-  getImage() async {
-    await ImagePicker.pickImage(source: ImageSource.camera).then((onValue) {
-      setState(() {
-        image = onValue;
-      });
+  Future getImage() async {
+    await ImagePicker.pickImage(source: ImageSource.gallery).then((onValue) {
+      print(onValue);
+      if (onValue == null) {
+      } else {
+        setState(() {
+          image = onValue;
+          print(image.toString());
+          // _imageList.add(_image);
+          // j = 0;
+          // selectedImage = _imageList[j];
+          // l++;
+        });
+      }
     });
   }
 
- uploadImage(File file) async
+
+uploadImage(File file) async
       {
-        print(invoiceNum.text);
-        print(expenseName.text);
-        print(_selectedCatagory);
-        print(cost.text);
-        print(descrip.text);
-        print(totalExpanse.text);
+        pr.show();
         print(file);
-        if(invoiceNum.text.isEmpty ||
-        expenseName.text.isEmpty ||
-        _selectedCatagory=="" ||
-        descrip.text.isEmpty ||
-        cost.text.isEmpty ||
-       totalExpanse.text.isEmpty  || file==null
-        )
-        {
-           Fluttertoast.showToast(
-              msg: "Please enter the required fields, selected expense head and image",
-              textColor: Colors.white,
-              backgroundColor: Colors.blueGrey);
-        }
-       // pr.show();
-       else
-       {
-         pr.show();
-         print(file);
         String img;
         String fileName = file.path.split('/').last;
       FormData data = FormData.fromMap({
@@ -136,13 +123,13 @@ class _AddExpenseState extends State<AddExpense> {
           img = imagecall.data['Data']['Result'].toString();
          // User.userData.userResult.imageUrl=img;
         });
-        saveExpense(img);
-        //pr.dismiss();
+        pr.dismiss();
         //  Fluttertoast.showToast(
         //       msg: "Image Updated",
         //       textColor: Colors.white,
         //       backgroundColor: Colors.blueGrey);
         print("Image url: " + img);
+        saveExpense(img);
      //   callAPiImage(context, imageurl);
       }).catchError((onError)
       {
@@ -152,13 +139,12 @@ class _AddExpenseState extends State<AddExpense> {
               textColor: Colors.white,
               backgroundColor: Colors.blueGrey);
       });
-       }
-        
       
       }
-   
   saveExpense(String img) async {
     int headId;
+    print(img);
+   
     for(int i=0;i<categories.length;i++)
     {
       if(_selectedCatagory==headersModel.result[i].name)
@@ -180,7 +166,8 @@ class _AddExpenseState extends State<AddExpense> {
       "AccountHeadId": "$headId",
       "Qty": "${qty.text.trim()}",
       "Price": "${cost.text.trim()}",
-      "CreatedOn":"$sDate"
+      "CreatedOn":"$sDate",
+      "Total":"${totalExpanse.text.trim()}",
     };
     var response = await http.post(
       "${API.AddGeneral}",
@@ -348,71 +335,9 @@ pr.dismiss();
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          _title("Invoice number"),
-          Container(
-            margin: EdgeInsets.only(bottom: 10),
-            height: 40,
-            child: TextFormField(
-              cursorColor: HexColor("#9E9E9E"),
-              style: TextStyle(fontSize: 16, fontFamily: "CaviarDreams"),
-              controller: invoiceNum,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                isDense: true,
-                focusColor: Colors.orange,
 
-                // filled: true,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          _title("Expense Name"),
-          Container(
-            margin: EdgeInsets.only(bottom: 10),
-            height: 40,
-            child: TextFormField(
-              controller: expenseName,
-              cursorColor: HexColor("#9E9E9E"),
-              style: TextStyle(fontSize: 16, fontFamily: "CaviarDreams"),
-              decoration: InputDecoration(
-                isDense: true,
-                focusColor: Colors.orange,
 
-                // filled: true,
-              ),
-            ),
-          ),
-          _title("Expense Head"),
           Container(
-            width: double.infinity,
-            margin: EdgeInsets.only(bottom: 10),
-            height: 40,
-            child: DropdownButton(
-              isExpanded: true,
-              icon: Container(
-                alignment: Alignment.centerRight,
-                child: Icon(Icons.arrow_drop_down),
-              ),
-              hint: Text('Choose a Catagory'), // Not necessary for Option 1
-              value: _selectedCatagory,
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedCatagory = newValue;
-                });
-              },
-              items: categories.map((catagory) {
-                return DropdownMenuItem(
-                  child: new Text(catagory),
-                  value: catagory,
-                );
-              }).toList(),
-            ),
-          ),
-
-          /////////////////////////////////////////////////////////////////
-  Container(
             padding: EdgeInsets.all(5),
             margin: EdgeInsets.symmetric(vertical: 10),
             height: MediaQuery.of(context).size.height * .14,
@@ -489,6 +414,71 @@ pr.dismiss();
               ],
             )),
           ),
+  
+          _title("Invoice number"),
+          Container(
+            margin: EdgeInsets.only(bottom: 10),
+            height: 40,
+            child: TextFormField(
+              cursorColor: HexColor("#9E9E9E"),
+              style: TextStyle(fontSize: 16, fontFamily: "CaviarDreams"),
+              controller: invoiceNum,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                isDense: true,
+                focusColor: Colors.orange,
+
+                // filled: true,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          _title("Expense Name"),
+          Container(
+            margin: EdgeInsets.only(bottom: 10),
+            height: 40,
+            child: TextFormField(
+              controller: expenseName,
+              cursorColor: HexColor("#9E9E9E"),
+              style: TextStyle(fontSize: 16, fontFamily: "CaviarDreams"),
+              decoration: InputDecoration(
+                isDense: true,
+                focusColor: Colors.orange,
+
+                // filled: true,
+              ),
+            ),
+          ),
+          _title("Expense Head"),
+          Container(
+            width: double.infinity,
+            margin: EdgeInsets.only(bottom: 10),
+            height: 40,
+            child: DropdownButton(
+              isExpanded: true,
+              icon: Container(
+                alignment: Alignment.centerRight,
+                child: Icon(Icons.arrow_drop_down),
+              ),
+              hint: Text('Choose a Catagory'), // Not necessary for Option 1
+              value: _selectedCatagory,
+              onChanged: (newValue) {
+                setState(() {
+                  _selectedCatagory = newValue;
+                });
+              },
+              items: categories.map((catagory) {
+                return DropdownMenuItem(
+                  child: new Text(catagory),
+                  value: catagory,
+                );
+              }).toList(),
+            ),
+          ),
+
+          /////////////////////////////////////////////////////////////////
         
           Row(
             children: <Widget>[

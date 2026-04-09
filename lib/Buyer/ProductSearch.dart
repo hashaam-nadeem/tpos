@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:transact/AppBar.dart';
+import 'package:transact/Buyer/itemDetails.dart';
 import 'package:transact/Model/UserModel.dart';
 import 'package:transact/Model/apismodel.dart';
 import 'package:transact/Model/getauthentication.dart';
+import 'package:transact/Model/marketplacemodel.dart';
 import 'package:transact/Model/productsearchmodel.dart';
 import 'package:transact/Model/searchmodel.dart';
 import 'package:transact/Model/submitsearchmodel.dart';
@@ -25,7 +27,7 @@ class _ProductSearch extends State<ProductSearch> {
   String search = "";
   ProductSearchModel productSearchModel= ProductSearchModel();
   List<SubmitModel> submitModel = List<SubmitModel>();
-
+  MarketPlaceModel marketPlaceModel=MarketPlaceModel();
     searchProductSupplier() async {
     var header = {
       "Authorization": AuthenticationUser.getAuthentication(),
@@ -43,12 +45,12 @@ class _ProductSearch extends State<ProductSearch> {
         //       textColor: Colors.white,
         //       backgroundColor: Colors.blueGrey);
         setState(() {
-          productSearchModel = new ProductSearchModel();
+          marketPlaceModel = new MarketPlaceModel();
         });
       } else {
         setState(() {
-          productSearchModel = ProductSearchModel.fromJson(Json['Data']);
-           User.userData.productSearchModel=productSearchModel;
+          marketPlaceModel = MarketPlaceModel.fromJson(Json['Data']);
+           User.userData.marketPlaceModel=marketPlaceModel;
         });
       }
     } else {
@@ -79,12 +81,12 @@ class _ProductSearch extends State<ProductSearch> {
         //       textColor: Colors.white,
         //       backgroundColor: Colors.blueGrey);
         setState(() {
-          productSearchModel = new ProductSearchModel();
-          User.userData.productSearchModel=productSearchModel;
+          //marketPlaceModel = new ProductSearchModel();
+          //User.userData.productSearchModel=productSearchModel;
         });
       } else {
         setState(() {
-          productSearchModel = ProductSearchModel.fromJson(Json['Data']);
+          marketPlaceModel = MarketPlaceModel.fromJson(Json['Data']);
         });
       }
     } else {
@@ -124,14 +126,7 @@ class _ProductSearch extends State<ProductSearch> {
                   setState(() {
                     search = value;
                   });
-                  if(User.userData.userResult.role==1)
-                  {
-                    searchProduct();
-                  }
-                  else
-                  {
-                    searchProduct();
-                  }
+                 searchProduct();
                 },
                 decoration: InputDecoration(
                     border: InputBorder.none,
@@ -143,8 +138,8 @@ class _ProductSearch extends State<ProductSearch> {
             ),
             Expanded(
               child: ListView.builder(
-                  itemCount: productSearchModel.result != null
-                      ? productSearchModel.result.length
+                  itemCount: marketPlaceModel.result != null
+                      ? marketPlaceModel.result.length
                       : 0,
                   itemBuilder: (BuildContext context, int index) {
                     return SearchItems(index);
@@ -188,9 +183,9 @@ class _ProductSearch extends State<ProductSearch> {
           // print(submitModel.result[0].id);
           setState(() {
             User.userData.index=index;
-            User.userData.productSearchModel=productSearchModel;
+            User.userData.marketPlaceModel=marketPlaceModel;
           });
-          AppRoutes.push(context, productItemDetails());
+          AppRoutes.push(context, ItemDetailsBuyer());
         },
         child: Container(
           margin: EdgeInsets.only(top: 15),
@@ -205,24 +200,24 @@ class _ProductSearch extends State<ProductSearch> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                Text("${productSearchModel.result[index].name}",
+                Text("${marketPlaceModel.result[index].name}",
                     style: TextStyle(
                         color: Colors.blueGrey,
                         fontSize: 12,
                         fontWeight: FontWeight.bold)),
-                Text("Price: ${productSearchModel.result[index].salePrice}",
+                Text("Price: ${marketPlaceModel.result[index].salePrice}",
                     style: TextStyle(
                         color: Colors.blueGrey,
                         fontSize: 12,
                         fontWeight: FontWeight.bold)),
-                productSearchModel.result[index].imagePath == null
+                marketPlaceModel.result[index].imagePath == null
                     ? Image.asset(
                         "images/prepaid.png",
                         width: 50,
                         height: 50,
                       )
                     : Image.network(
-                        "${API.API_URL}${productSearchModel.result[index].imagePath}",
+                        "${API.API_URL}${marketPlaceModel.result[index].imagePath}",
                         width: 50,
                         height: 50,
                       ),

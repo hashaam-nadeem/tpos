@@ -23,7 +23,8 @@ class _BottomButtonState extends State<BottomButton> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.ontap,
-      child: Container(
+      child:
+       Container(
         alignment: Alignment.bottomCenter,
         height: MediaQuery.of(context).size.height * .07,
         width: MediaQuery.of(context).size.width / 1.2,
@@ -34,6 +35,7 @@ class _BottomButtonState extends State<BottomButton> {
             color: widget.customColor == true
                 ? widget.color
                 : HexColor("#3B444B")),
+       
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -58,6 +60,7 @@ class _BottomButtonState extends State<BottomButton> {
           ],
         ),
       ),
+   
     );
   }
 }

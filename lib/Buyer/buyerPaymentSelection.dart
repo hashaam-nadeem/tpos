@@ -39,6 +39,8 @@ class _BuyerPaymentSelectionState extends State<BuyerPaymentSelection> {
         "DelieryType": "${User.userData.deliveryOption}",
         "DeliveryAddressId": "${User.userData.addressModel.result[User.userData.index].id}",
         "DeliveryCost": "${User.userData.deliveryCost}",
+        "Email":"${User.userData.email}",
+        "Phone":"${User.userData.contact}"
       };
       print(header);
 
@@ -163,7 +165,7 @@ class _BuyerPaymentSelectionState extends State<BuyerPaymentSelection> {
           ),
           _paymentOption(
             "images/currency.png",
-            "COD",
+            "Cash",
           ),
           _paymentOption(
             "images/cards.png",
@@ -321,7 +323,7 @@ class _BuyerPaymentSelectionState extends State<BuyerPaymentSelection> {
   }
 
   void radioButtonChanges(String value) {
-    if (value == "COD") {
+    if (value == "Cash") {
       setState(() {
         selected = 0;
       });

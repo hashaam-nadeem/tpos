@@ -267,8 +267,11 @@ else
           scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) {
             return Image.network(
-                "${API.API_URL}${User.userData.marketPlaceModel.result[User.userData.index].imgList[index].url}");
-
+                "${API.API_URL}${User.userData.marketPlaceModel.result[User.userData.index].imgList[index].url}",
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height*.2,
+                fit: BoxFit.cover,
+                );
             // Container(
             //   child: Image(
             //     height: 200,
@@ -755,6 +758,7 @@ else
                       AdminChat(
                         name: User.userData.marketPlaceModel
                             .result[User.userData.index].name,
+                            userName: User.userData.userResult.fullname,
                         peerid: User.userData.marketPlaceModel
                             .result[User.userData.index].userId,
                         pic: User.userData.marketPlaceModel
